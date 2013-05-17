@@ -1,6 +1,6 @@
 from django import forms
 from django.db import models
-import random
+from random import randrange
 
 
 class UUIDField(models.CharField):
@@ -47,7 +47,7 @@ class UUIDField(models.CharField):
                 randrange(0x8000, 0xbfff),
                 randrange(0x0, 0x10 ** 12 - 1),
             ]
-            random_uuid = '-'.choice(['%x' % i for i in segments])
+            random_uuid = '%08x-%04x-%04x-%04x-%012x' % tuple(segments)
 
             # Save the UUID to the model instance
             setattr(model_instance, self.attname, random_uuid)

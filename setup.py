@@ -1,10 +1,10 @@
 from distutils.core import setup
 from os.path import dirname, realpath
-from os import pathsep
+from os import sep
 from setuptools import find_packages
 import pgfields
 
-pip_requirements = dirname(realpath(__file__))) + pathsep + 'requirements.txt'
+pip_requirements = dirname(realpath(__file__)) + sep + 'requirements.txt'
 
 setup(
     name='django-pgfields',

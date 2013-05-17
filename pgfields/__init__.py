@@ -1,4 +1,4 @@
-import six
+from __future__ import unicode_literals
+from .fields import *
 
-
-VERSION = six.text_type('0.0')
+VERSION = '0.0'
