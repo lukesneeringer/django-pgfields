@@ -1,4 +1,15 @@
-__pycache__
+# Apple
 .DS_Store
+
+# Python
+__pycache__
 *.pyc
 *.egg-info
+
+# Sphinx
+docs/_build
+
+# Testing
+.coverage
+coverage/
+.tox/
