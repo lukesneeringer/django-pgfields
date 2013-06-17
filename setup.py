@@ -24,11 +24,13 @@ class Tox(TestCommand):
 
 
 setup(
+    # Basic metadata
     name='django-pgfields',
     version=version,
     author='Luke Sneeringer',
     author_email='luke@sneeringer.com',
 
+    # Additional information
     description=' '.join((
         'Provides custom Field subclasses intended for use with types',
         'available in PostgreSQL but not in the Django core ORM,',
@@ -36,12 +38,28 @@ setup(
     )),
     license='New BSD',
 
+    # How to do the install
     install_requires=open(pip_requirements, 'r').read().strip().split('\n'),
     provides=[
         'django_pg',
     ],
     packages=find_packages(),
 
+    # How to do the tests
     tests_require=['tox'],
     cmdclass={'test': Tox },
+
+    # PyPI metadata
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Web Environment',
+        'Framework :: Django',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3.3',
+        'Topic :: Database',
+        'Topic :: Software Development',
+    ],
 )
