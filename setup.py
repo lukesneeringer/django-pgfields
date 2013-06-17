@@ -30,7 +30,8 @@ setup(
     author_email='luke@sneeringer.com',
 
     description=' '.join((
-        'Provides extensions such as field classes for PostgreSQL types,',
+        'Provides custom Field subclasses intended for use with types',
+        'available in PostgreSQL but not in the Django core ORM,',
         'including arrays and composite types.',
     )),
     license='New BSD',
