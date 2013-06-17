@@ -29,6 +29,7 @@ setup(
     version=version,
     author='Luke Sneeringer',
     author_email='luke@sneeringer.com',
+    url='https://github.com/lukesneeringer/django-pgfields',
 
     # Additional information
     description=' '.join((
