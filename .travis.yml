@@ -1,4 +1,6 @@
 language: python
 python: '3.3'
-before_script: "psql -U postgres -c 'create database django_pg;'"
+before_script:
+    - "pip install --use-mirrors -r tests/requirements.txt"
+    - "psql -U postgres -c 'create database django_pg;'"
 script: 'python setup.py test'

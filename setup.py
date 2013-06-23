@@ -6,12 +6,12 @@ from setuptools.command.test import test as TestCommand
 import sys
 
 pip_requirements = 'requirements.txt'
-version = open('VERSION').read().strip()
+
 
 class Tox(TestCommand):
     """The test command should install and then run tox.
 
-    Bawed on http://tox.readthedocs.org/en/latest/example/basic.html
+    Based on http://tox.readthedocs.org/en/latest/example/basic.html
     """
     def finalize_options(self):
         super().finalize_options()
@@ -26,7 +26,7 @@ class Tox(TestCommand):
 setup(
     # Basic metadata
     name='django-pgfields',
-    version=version,
+    version=open('VERSION').read().strip(),
     author='Luke Sneeringer',
     author_email='luke@sneeringer.com',
     url='https://github.com/lukesneeringer/django-pgfields',
@@ -44,11 +44,16 @@ setup(
     provides=[
         'django_pg',
     ],
-    packages=find_packages(),
+    packages=[i for i in find_packages() if i.startswith('django_pg')],
 
     # How to do the tests
     tests_require=['tox'],
     cmdclass={'test': Tox },
+
+    # Data files
+    package_data={
+        'django_pg': ['VERSION'],
+    },
 
     # PyPI metadata
     classifiers=[

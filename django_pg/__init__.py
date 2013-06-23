@@ -1,5 +1,8 @@
 from __future__ import unicode_literals
-from os.path import dirname, realpath
+import os
 
 
-__version__ = open(realpath(dirname(__file__)) + '/../VERSION').read().strip()
+_dirname = os.path.dirname(os.path.realpath(__file__))
+__version__ = tuple(
+    open('%s/VERSION' % _dirname).read().strip().replace('-', '.').split('.'),
+)
