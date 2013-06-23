@@ -4,6 +4,7 @@
 include AUTHORS
 include LICENSE
 include VERSION
+include django_pg/VERSION
 include requirements.txt
 
 # -------------------
