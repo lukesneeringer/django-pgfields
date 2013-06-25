@@ -70,5 +70,6 @@ Index
     usage
     fields
     composite
+    releases/index
 
 .. _Issue Tracker: https://github.com/lukesneeringer/django-pgfields/issues
