@@ -9,7 +9,25 @@ Overview
 
 This release of django-pgfields contains the following major features:
 
+* `South Support <#south-support>`_
 
 
 Features
 --------
+
+South Support
+~~~~~~~~~~~~~
+
+django-pgfields 0.9.2 adds out-of-the-box support for South_, the popular
+migrations application for Django. With this release, all fields
+provided by django-pgfields are given appropriate introspection rules for
+South.
+
+This also applies to any subclasses of ``CompositeField``, which are given
+automatic introspection rules. This does *not* examine your subclass,
+however, so it is your responsibility to `add introspection rules`_ if your
+subclass takes constructor arguments.
+
+
+.. _South: http://south.aeracode.org/
+.. _add introspection rules: http://south.readthedocs.org/en/latest/customfields.html#rules

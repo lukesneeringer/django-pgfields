@@ -151,5 +151,23 @@ class CompositeMeta(models.SubfieldBase):
             module = import_module(new_class.__module__)
             setattr(module, instance_class.__name__, instance_class)
 
+        # If South is installed, then add introspection rules for it.
+        try:
+            from south.modelsinspector import add_introspection_rules
+            add_introspection_rules([
+                (
+                    (new_class,),
+                    [],
+                    {
+                        'null': ['null', { 'default': True }],
+                    },
+                )
+            ], [r'^{module}\.{class_name}'.format(
+                class_name=new_class.__name__,
+                module=new_class.__module__.replace('.', r'\.'),
+            )])
+        except ImportError:
+            pass
+
         # Return the new class.
         return new_class

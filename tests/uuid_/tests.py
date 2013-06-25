@@ -1,6 +1,8 @@
 from django.test import TestCase
+from django.utils.unittest import skipIf
 from django_pg import models
 from django_pg.models.fields.uuid import UUIDAdapter, UUIDField
+from django_pg.utils.south import south_installed
 from tests.uuid_.models import Movie, Game, Book
 import uuid
 
