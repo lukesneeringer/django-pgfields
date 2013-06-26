@@ -6,54 +6,119 @@ from django_pg.utils.south import south_installed
 
 
 @skipIf(not south_installed, 'South is not installed.')
-class SouthSuite(TestCase):
+class MigrationCreationSuite(TestCase):
     """A test case for the creation of South migrations."""
 
-    def test_migration_creation(self):
-        """Test that I can create a migration with all of my
-        custom fields.
+    def setUp(self):
+        """Fake the creation of a migration, and store the migration
+        contents to test against.
         """
-        # Fake the creation of a migration.
         # The '-' argument to `schemamigration` sends the migration
-        #   to stdout rather than actually creating a real migration.
+        # to stdout rather than actually creating a real migration.
         with redirect_std() as std:
             call_command('schemamigration', 'south_migrations', '-', auto=True)
-            out = std['out'].getvalue()
+            self.migration_code = std['out'].getvalue()
 
-        # Define values that I expect.
-        # Sadly, there's no pretty way to do this.
-        needles = {
-            "'books':": (
-                "'django_pg.models.fields.array.ArrayField', [], {'of': ",
-                "\"SchemaMigration.gf(None, 'tests.composite.fields.BookField')()\"}),",
+    def test_array_freeze(self):
+        """Test that array migrations are frozen as I expect."""
+
+        self.find_in_migration("'books':", (
+            "'django_pg.models.fields.array.ArrayField', [], {'of': ",
+            ''.join((
+                "\"SchemaMigration.gf(None, 'tests.composite.",
+                "fields.BookField')()\"}),",
+            )),
+        ))
+
+    def test_array_forwards(self):
+        """Test that the creation of an ArrayField in the forwards
+        migration appears to be valid code.
+        """
+        self.find_in_migration(
+            "db.add_column('south_migrations_author', 'books',",
+            (
+                "self.gf('django_pg.models.fields.array.ArrayField')(",
+                ''.join((
+                    "of=SchemaMigration.gf(None, 'tests.composite.",
+                    "fields.BookField')()",
+                )),
+                "keep_default=False",
             ),
-            "'uuid':": (
-                "('django_pg.models.fields.uuid.UUIDField', [], {",
-                "'null': 'True'",
+            distance=200,
+        )
+
+    def test_json_freeze(self):
+        """Test that JSON fields are frozen as I expect."""
+
+        self.find_in_migration("'data':", (
+            "('django_pg.models.fields.json.JSONField', [], {",
+        ))
+
+    def test_json_forwards(self):
+        """Test that JSON fields are given valid representations
+        in the forwards method of migrations.
+        """
+
+        self.find_in_migration(
+            "db.add_column('south_migrations_author', 'data',",
+            (
+                "self.gf('django_pg.models.fields.json.JSONField')(",
+                "keep_default=False",
             ),
-            "db.add_column('south_migrations_author', 'uuid',": (
+            distance=150,
+        )
+
+    def test_uuid_freeze(self):
+        """Test that UUID fields are frozen as I expect."""
+
+        self.find_in_migration("'uuid':", (
+            "('django_pg.models.fields.uuid.UUIDField', [], {",
+            "'null': 'True'",
+        ))
+
+    def test_uuid_forwards(self):
+        """Test that UUID fields are given valid representations
+        in the forwards method of migrations.
+        """
+
+        self.find_in_migration(
+            "db.add_column('south_migrations_author', 'uuid',",
+            (
                 "self.gf('django_pg.models.fields.uuid.UUIDField')(",
                 "null=True",
                 "keep_default=False",
             ),
-            "db.add_column('south_migrations_author', 'books',": (
-                "self.gf('django_pg.models.fields.array.ArrayField')(",
-                "of=SchemaMigration.gf(None, 'tests.composite.fields.BookField')()",
-                "keep_default=False",
-            ),
-        }
+            distance=150,
+        )
 
-        # Assert that each of my expected migration blocks does,
-        # in fact, exist.
-        for anchor, sub_needles in needles.items():
-            # Each key should exist in the output. If it doesn't,
-            # we have a different problem.
-            assert anchor in out, 'Could not find: %s' % item
 
-            # Each needle in the value tuple should also be present,
-            # and should be present shortly after the anchor. 
-            index = out.index(anchor) + len(anchor)
-            for needle in sub_needles:
-                assert needle in out[index:index + 200], ' '.join((
-                    'Could not find', needle, 'near', anchor
-                ))
+    def find_in_migration(self, anchor, needles, terminus='\n', distance=None):
+        """Assert the presence of the given anchor in the output.
+
+        Once the anchor is found, assert the presence of *each* provided
+        needle within bounds. If `terminus` is provided, each needle must
+        appear before the next instance of `terminus`.
+
+        If `distance` is provided, each needle must appear within `distance`
+        characters, and `terminus` is ignored.
+        """
+
+        # The anchor must exist. If it doesn't, we have another problem.
+        assert anchor in self.migration_code, 'Could not find: %s' % anchor
+        start = self.migration_code.index(anchor) + len(anchor)
+
+        # If a distance is provided, get the substring based on it.
+        # Otherwise, use the terminus.
+        if distance:
+            block = self.migration_code[start:start + distance]
+        else:
+            try:
+                end = self.migration_code.index(terminus, start)
+            except ValueError:
+                end = None
+            block = self.migration_code[start:end]
+
+        # Assert that each of my expected needles is found in the
+        # given haystack.
+        for needle in needles:
+            assert needle in block, 'Could not find text:\n%s' % needle

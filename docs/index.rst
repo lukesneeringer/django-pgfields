@@ -9,6 +9,7 @@ backend, and adds support for:
 
 * Arrays
 * Composte Types
+* JSON
 * UUIDs
 
 Dependencies & Limitations
