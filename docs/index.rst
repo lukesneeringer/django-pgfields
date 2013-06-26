@@ -18,7 +18,7 @@ Dependencies & Limitations
 django-pgfields comes with two dependencies:
 
 * Python 3.3+ (Python 2 is *not* currently supported.)
-* Django 1.5.1+
+* Django 1.5+
 * Psycopg2 2.5+
 
 .. warning::
