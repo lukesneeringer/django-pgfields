@@ -15,7 +15,7 @@ backend, and adds support for:
 Dependencies & Limitations
 --------------------------
 
-django-pgfields comes with two dependencies:
+django-pgfields depends on:
 
 * Python 3.3+ (Python 2 is *not* currently supported.)
 * Django 1.5+
