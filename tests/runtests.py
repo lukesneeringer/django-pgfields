@@ -30,8 +30,7 @@ if __name__ == '__main__':
     @receiver(connection_created)
     def on_connection_created(sender, connection, **kwargs):
         """When a connection is created, ensure that required custom
-        database types are created, as our standard processing only handles
-        this on the "real" database (not the test one).
+        database types are created.
         """
         for model in get_models():
             # Iterate over the fields and create any type that does not

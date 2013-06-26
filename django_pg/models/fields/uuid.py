@@ -1,4 +1,5 @@
 from django.db.models import Field, SubfieldBase
+from django_pg.utils.south import south_installed
 from psycopg2.extensions import register_adapter
 import uuid
 
@@ -87,3 +88,16 @@ class UUIDAdapter:
 
     def getquoted(self):
         return ("'%s'" % self.value).encode('utf8')
+
+# If South is installed, then tell South how to properly
+# introspect a UUIDField.
+if south_installed:
+    from south.modelsinspector import add_introspection_rules
+    add_introspection_rules([(
+        (UUIDField,),
+        [],
+        {
+            'auto_add': ['_auto_add', { 'default': False }],
+            'unique': ['unique', { 'default': True }],
+        },
+    )], (r'^django_pg\.models\.fields\.uuid\.UUIDField',))

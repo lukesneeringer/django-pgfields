@@ -1,5 +1,6 @@
 import os
 import sys
+from django_pg.utils.south import south_installed
 
 
 DEBUG = True
@@ -36,3 +37,7 @@ for module in os.listdir(os.path.dirname(__file__)):
     full_dir = os.path.dirname(__file__) + '/' + module
     if os.path.isdir(full_dir) and os.path.isfile(full_dir + '/__init__.py'):
         INSTALLED_APPS.append('tests.' + module)
+
+# If South is installed, then add it to installed apps.
+if south_installed:
+    INSTALLED_APPS.append('south')

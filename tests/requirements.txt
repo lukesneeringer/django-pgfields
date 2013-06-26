@@ -1,1 +1,2 @@
+coverage
 py>=1.4.15

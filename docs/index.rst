@@ -9,15 +9,16 @@ backend, and adds support for:
 
 * Arrays
 * Composte Types
+* JSON
 * UUIDs
 
 Dependencies & Limitations
 --------------------------
 
-django-pgfields comes with two dependencies:
+django-pgfields depends on:
 
 * Python 3.3+ (Python 2 is *not* currently supported.)
-* Django 1.5.1+
+* Django 1.5+
 * Psycopg2 2.5+
 
 .. warning::
@@ -70,5 +71,6 @@ Index
     usage
     fields
     composite
+    releases/index
 
 .. _Issue Tracker: https://github.com/lukesneeringer/django-pgfields/issues

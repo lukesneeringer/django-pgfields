@@ -1,6 +1,0 @@
-[run]
-source = ../django_pg/
-branch = False
-
-[html]
-directory = ../coverage/

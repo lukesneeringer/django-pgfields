@@ -117,6 +117,34 @@ class ArrayField(models.Field, metaclass=models.SubfieldBase):
             return self._of.register_composite(connection, globally=globally)
         return
 
+    def south_field_triple(self):
+        """Return a description of this field parsable by South."""
+
+        # It's safe to import South at this point; this method
+        # will never actually be called unless South is installed.
+        from south.modelsinspector import introspector
+
+        # Get the args and kwargs with which this field was generated.
+        # The "double" variable name is a riff of of South "triples", since
+        #   the `introspector` function only returns the final two elements
+        #   of a South triple. This is fine since those two pieces are all
+        #   we actually need.
+        double = introspector(self._of)
+
+        # Return the appropriate South triple.
+        return (
+            '%s.%s' % (self.__class__.__module__, self.__class__.__name__),
+            [],
+            {
+                'of': "SchemaMigration.gf(None, '{module}.{class_name}')({field_def})".format(
+                    class_name=self._of.__class__.__name__,
+                    field_def=', '.join(double[0] + ["%s=%s" % (key, value)
+                                        for key, value in double[1].items()]),
+                    module=self._of.__class__.__module__,
+                ),
+            },
+        )
+
     def to_python(self, value):
         """Convert the database value to a Python list."""
 

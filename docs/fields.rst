@@ -94,6 +94,64 @@ Such lookups are simple and straightforward::
     'Peregrin Took'
 
 
+JSON Field
+----------
+
+.. version_added:: 0.9.2
+
+PostgreSQL 9.2 added initial support for a JSON data type. If you wish to
+store JSON natively in PostgreSQL, use the JSONField field::
+
+    from django_pg import models
+
+    class Dwarf(models.Model):
+        name = models.CharField(max_length=50)
+        data = models.JSONField()
+        created = models.DateTimeField(auto_now_add=True)
+        modified = models.DateTimeField(auto_now=True)
+
+If you're using a version of PostgreSQL earlier than 9.2, this field will
+fall back to the ``text`` data type.
+
+.. warning::
+    
+    As of PostgreSQL 9.2, *storing* JSON is fully supported, but doing
+    any useful kind of lookup (including direct equality) on it is not.
+    
+    As such, django-pgfields supports storing JSON data, and will return
+    the JSON fields' data to you when you lookup a record by other means,
+    but it does *not* support *any* kind of lookup against JSON fields.
+    Attempting *any* lookup will raise TypeError.
+
+Values
+^^^^^^
+
+The JSON field will return values back to you in the Python equivalents
+of the native JavaScript types:
+
+* JavaScript ``number`` instances will be converted to ``int`` or ``float``
+  as appropriate.
+* JavaScript ``array`` instances will be converted to Python ``list`` instances,
+  and value conversion will be recursively applied to every item in the list.
+* JavaScript ``object`` instances will be converted to Python ``dict``,
+  and value conversion will be recursively applied to the keys and values
+  of the dictionary.
+* JavaScript ``string`` instances will be converted to Python 3 ``str``.
+* JavaScript ``boolean`` instances will be converted to Python ``bool``.
+* JavaScript ``null`` is converted to Python ``None``.
+* JavaScript special values (``NaN``, ``Infinity``) are converted to their
+  Python equivalents. Use ``math.isnan`` and ``math.isinf`` to test for them.
+
+.. note::
+
+    Because field subclasses are called to convert values over and over again,
+    there are a few cases where the conversion is not idempotent. In
+    particular, strings that are also valid JSON (or look sufficiently close
+    to valid JSON) will be deserialized again.
+
+The short version: write Python dictionaries, lists, and scalars, and
+the JSON field will figure out what to do with it.
+
 UUID Field
 ----------
 
