@@ -24,10 +24,7 @@ class MigrationCreationSuite(TestCase):
 
         self.find_in_migration("'books':", (
             "'django_pg.models.fields.array.ArrayField', [], {'of': ",
-            ''.join((
-                "\"SchemaMigration.gf(None, 'tests.composite.",
-                "fields.BookField')()\"}),",
-            )),
+            "('tests.composite.fields.BookField', [], {})}),",
         ))
 
     def test_array_forwards(self):
@@ -38,10 +35,7 @@ class MigrationCreationSuite(TestCase):
             "db.add_column('south_migrations_author', 'books',",
             (
                 "self.gf('django_pg.models.fields.array.ArrayField')(",
-                ''.join((
-                    "of=SchemaMigration.gf(None, 'tests.composite.",
-                    "fields.BookField')()",
-                )),
+                "of=('tests.composite.fields.BookField', [], {})",
                 "keep_default=False",
             ),
             distance=200,

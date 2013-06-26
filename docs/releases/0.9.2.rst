@@ -29,6 +29,12 @@ automatic introspection rules. This does *not* examine your subclass,
 however, so it is your responsibility to `add introspection rules`_ if your
 subclass takes constructor arguments.
 
+.. note::
+    
+    South migrations using ArrayField were broken in django-pgfields 0.9.2;
+    while the initial migration including the ArrayField would run,
+    subsequent migrations would not. This has been corrected and a subsequent
+    release, django-pgfields 0.9.2.1, issued.
 
 .. _South: http://south.aeracode.org/
 .. _add introspection rules: http://south.readthedocs.org/en/latest/customfields.html#rules

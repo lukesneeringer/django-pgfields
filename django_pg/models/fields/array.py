@@ -1,5 +1,6 @@
 from django.core.management.color import no_style
 from django.db import models
+from django_pg.utils.south import south_installed
 
 
 class ArrayField(models.Field, metaclass=models.SubfieldBase):
@@ -8,6 +9,18 @@ class ArrayField(models.Field, metaclass=models.SubfieldBase):
     description = 'PostgreSQL arrays.'
 
     def __init__(self, of=models.IntegerField, **kwargs):
+        # The `of` argument is a bit tricky once we need compatibility
+        #   with South.
+        # South can't store a field, and the eval it performs doesn't
+        #   put enough things in the context to use South's internal
+        #   "get field" function (`BaseMigration.gf`).
+        # Therefore, we need to be able to accept a South triple of our
+        #   sub-field and hook into South to get the correct thing
+        #   back.
+        if isinstance(of, tuple) and south_installed:
+            from south.utils import ask_for_it_by_name as gf
+            of = gf(of[0])(*of[1], **of[2])
+
         # Arrays in PostgreSQL are arrays of a particular type.
         # Save the subtype in our field class.
         self._of = of
@@ -136,11 +149,17 @@ class ArrayField(models.Field, metaclass=models.SubfieldBase):
             '%s.%s' % (self.__class__.__module__, self.__class__.__name__),
             [],
             {
-                'of': "SchemaMigration.gf(None, '{module}.{class_name}')({field_def})".format(
-                    class_name=self._of.__class__.__name__,
-                    field_def=', '.join(double[0] + ["%s=%s" % (key, value)
-                                        for key, value in double[1].items()]),
-                    module=self._of.__class__.__module__,
+                # The `of` argument is *itself* another triple, of
+                #   the internal field.
+                # The ArrayField constructor understands how to resurrect
+                #   its internal field from this serialized state.
+                'of': (
+                    '{module}.{class_name}'.format(
+                        module=self._of.__class__.__module__,
+                        class_name=self._of.__class__.__name__,
+                    ),
+                    double[0],
+                    double[1],
                 ),
             },
         )
