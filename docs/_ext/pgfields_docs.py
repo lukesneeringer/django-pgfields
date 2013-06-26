@@ -3,8 +3,8 @@ from sphinx.util.compat import Directive
 
 
 def setup(app):
-    app.add_directive('version_added', VersionDirective)
-    app.add_directive('version_changed', VersionDirective)
+    app.add_directive('versionadded', VersionDirective)
+    app.add_directive('versionchanged', VersionDirective)
     app.add_config_value('next_version', '1.0', True)
 
 

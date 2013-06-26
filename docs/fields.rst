@@ -97,7 +97,7 @@ Such lookups are simple and straightforward::
 JSON Field
 ----------
 
-.. version_added:: 0.9.2
+.. versionadded:: 0.9.2
 
 PostgreSQL 9.2 added initial support for a JSON data type. If you wish to
 store JSON natively in PostgreSQL, use the JSONField field::
