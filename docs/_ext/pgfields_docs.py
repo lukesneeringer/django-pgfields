@@ -1,3 +1,4 @@
+import os
 from sphinx import addnodes
 from sphinx.util.compat import Directive
 
@@ -37,10 +38,15 @@ class VersionDirective(Directive):
             version = self.arguments[0]
             version_string = 'version %s' % version
 
+        # Determine the proper node text.
+        # This should be simple, but Read the Docs misbehaves
+        #   (and does so in a totally undocumented way). Sigh.
+        kwargs = {}
+        if not os.environ.get('READTHEDOCS', None):
+            kwargs['text'] = 'New in %s.' % version_string
+
         # Create and append the node.
-        node = addnodes.versionmodified(
-            text='New in %s.' % version_string,
-        )
+        node = addnodes.versionmodified(**kwargs)
         answer.append(node)
 
         # Place the node into the contents.
