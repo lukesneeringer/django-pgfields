@@ -1,6 +1,7 @@
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils.unittest import skipIf
+from django_pg import models
 from django_pg.utils.context import redirect_std
 from django_pg.utils.south import south_installed
 
@@ -85,6 +86,17 @@ class MigrationCreationSuite(TestCase):
             distance=150,
         )
 
+    def test_array_resurrection(self):
+        """Assert that we can reconstruct an array from a South triple."""
+
+        # Create the Array field.
+        array_field = models.ArrayField(
+            of=('django.db.models.CharField', [], { 'max_length': 50 })
+        )
+
+        # Establish that the `of` sub-field was generated as expected.
+        self.assertIsInstance(array_field._of, models.CharField)
+        self.assertEqual(array_field._of.max_length, 50)
 
     def find_in_migration(self, anchor, needles, terminus='\n', distance=None):
         """Assert the presence of the given anchor in the output.
