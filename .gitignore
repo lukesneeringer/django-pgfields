@@ -13,3 +13,7 @@ docs/_build
 .coverage
 coverage/
 .tox/
+
+# Distribute
+dist/
+build/
