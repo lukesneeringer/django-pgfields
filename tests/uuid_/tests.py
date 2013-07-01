@@ -49,6 +49,11 @@ class UUIDAutoSuite(TestCase):
         ))
         self.assertEqual(movie.title, 'The Return of the King')
 
+    def test_uuid_uneditable(self):
+        """Test that the auto-added UUID is, in fact, not editable."""
+        id_field = Movie._meta.get_field_by_name('id')[0]
+        self.assertEqual(id_field.editable, False)
+
 
 class UUIDManualSuite(TestCase):
     """Test suite for manual UUID fields (those without `auto_add=True`)."""
@@ -86,6 +91,12 @@ class UUIDManualSuite(TestCase):
         game = Game()
         game.uuid = '01234567-abcd-abcd-abcd-0123456789ab'
         assert isinstance(game.uuid, uuid.UUID), 'Value should be a UUID.'
+
+    def test_uuid_editable(self):
+        """Test that the auto-added UUID is, in fact, not editable."""
+        uuid_field = Game._meta.get_field_by_name('uuid')[0]
+        self.assertEqual(uuid_field.editable, True)
+
 
 class NullUUIDSuite(TestCase):
     """Ensure that behavior around nullable UUID fields functions

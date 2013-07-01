@@ -16,6 +16,11 @@ class UUIDField(Field, metaclass=SubfieldBase):
         if 'unique' not in kwargs:
             kwargs['unique'] = True
 
+        # If `auto_add` is enabled, it should imply that the field
+        # is not editable, and should not show up in ModelForms.
+        if auto_add and 'editable' not in kwargs:
+            kwargs['editable'] = False
+
         # Blank values shall be nulls.
         if kwargs.get('blank', False) and not kwargs.get('null', False):
             raise AttributeError(' '.join((

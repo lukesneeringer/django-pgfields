@@ -1,0 +1,28 @@
+===================
+django-pgfields 1.0
+===================
+
+Welcome to django-pgfields 1.0!
+
+Overview
+--------
+
+This release is considered the first true, stable release of
+django-pgfields. It adds sufficient support for tools within the Django
+ecosystem (gis, south) to be usable, and all documented aspects of the
+module should not change at this point, except to accomodate a substantial
+change in Django itself.
+
+This release of django-pgfields contains the following major features:
+
+Features
+--------
+
+
+Minor Improvements
+------------------
+
+* If ``auto_add=True`` is set on a UUID field, it now implies
+  ``editable=False``. This makes it behave as much like AutoField as possible,
+  since a primary key replacement is one of the most likely reasons to use
+  auto_add at all.

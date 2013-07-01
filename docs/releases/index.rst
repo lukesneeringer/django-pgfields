@@ -8,4 +8,5 @@ to be aware of any backwards incompatible changes.
 .. toctree::
     :maxdepth: 1
 
+    1.0 <1.0>
     0.9.2 <0.9.2>
