@@ -3,6 +3,7 @@ import os
 
 
 _dirname = os.path.dirname(os.path.realpath(__file__))
-__version__ = tuple(
-    open('%s/VERSION' % _dirname).read().strip().replace('-', '.').split('.'),
-)
+with open('%s/VERSION' % _dirname) as version_file:
+    __version__ = tuple(
+        version_file.read().strip().replace('-', '.').split('.'),
+    )
