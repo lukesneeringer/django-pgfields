@@ -18,6 +18,19 @@ This release of django-pgfields contains the following major features:
 Features
 --------
 
+* Added an `improved repr <#improved-repr>`_ implementation to Model.
+
+Improved Repr
+-------------
+
+django-pgfields 1.0 provides an improved ``__repr__`` implementation on
+the base Model, from which your models inherit.
+
+As this is not the core mission of django-pgfields, this functionality is
+provided on an opt-in basis, and will only be activated if you set a particular setting.
+
+For more information, see the
+`improved repr documentation <../misc.html#improved-repr>`_.
 
 Minor Improvements
 ------------------

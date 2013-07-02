@@ -41,3 +41,7 @@ for module in os.listdir(os.path.dirname(__file__)):
 # If South is installed, then add it to installed apps.
 if south_installed:
     INSTALLED_APPS.append('south')
+
+# Easiest default test settings for django-pgfields itself.
+DJANGOPG_IMPROVED_REPR = True
+DJANGOPG_REPR_TEMPLATE = 'single_line'

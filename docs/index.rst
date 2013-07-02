@@ -27,7 +27,7 @@ django-pgfields depends on:
     PostGIS backend from ``django.contrib.gis``. Any individual model can
     either use our Manager subclass or the GIS Manager subclass, but not both.
 
-    This limitation will (hopefully) be addressed soon.
+    This limitation will be addressed for 1.0-final.
 
 Quick Start
 -----------
@@ -71,6 +71,7 @@ Index
     usage
     fields
     composite
+    misc
     releases/index
 
 .. _Issue Tracker: https://github.com/lukesneeringer/django-pgfields/issues
