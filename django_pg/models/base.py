@@ -59,7 +59,7 @@ class Model(models.Model):
         if hasattr(self._meta, 'repr_fields'):
             field_names = self._meta.repr_fields
         else:
-            field_names = [i.name for i in self._meta._fields()]
+            field_names = [i.name for i in self._meta.fields]
             for field_name in getattr(self._meta, 'repr_fields_exclude', []):
                 if field_name in field_names:
                     field_names.remove(field_name)

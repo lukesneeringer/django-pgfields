@@ -39,7 +39,7 @@ class BasicReprSuite(TestCase):
 
     def _test_improved_repr(self):
         instance = self._testing_model.objects.all()[0]
-        for key in [i.name for i in self._testing_model._meta._fields()]:
+        for key in [i.name for i in self._testing_model._meta.fields]:
             # Determine whether this repr item accepts depth.
             # If it does, send depth of 2; otherwise, do nothing.
             field_value = getattr(instance, key)
@@ -81,7 +81,7 @@ class M2MReprSuite(BasicReprSuite):
     """A class for testing many to many repr prints.
 
     Since the many to many field is not technically part of
-    Model._meta._fields(), it is just skipped, and therefore this test does
+    Model._meta.fields, it is just skipped, and therefore this test does
     very little.
 
     It remains in place in case Django's behavior should change, as unlikely
@@ -154,7 +154,7 @@ class SupportSuite(TestCase):
     def test_dict_template(self):
         book = Book.objects.get()
         expected_value = []
-        for field in [i.name for i in Book._meta._fields()]:
+        for field in [i.name for i in Book._meta.fields]:
             expected_value.append('%r: %r' % (field, getattr(book, field)))
         expected_value = '{%s}' % ', '.join(expected_value)
         self.assertEqual(repr(book), expected_value)
