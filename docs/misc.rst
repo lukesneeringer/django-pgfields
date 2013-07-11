@@ -14,7 +14,7 @@ django-pgfields adds an optional, opt-in improved ``__repr__`` method
 on the base Model class.
 
 The default ``__repr__`` implementation on the Model class simply
-identifies the model class to which the instance belonds, and does nothing
+identifies the model class to which the instance belongs, and does nothing
 else::
 
     >>> mymodel = MyModel.objects.create(spam='eggs', foo='bar')
