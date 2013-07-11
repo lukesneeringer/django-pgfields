@@ -1,8 +1,11 @@
 from django.conf import settings
-from django.db import models
+from django.contrib.gis.db import models as gis_models
+from django.db import connections, models
 from django.db.models import options
-from django_pg.models.query import QuerySet
+from django.db.utils import DEFAULT_DB_ALIAS
+from django_pg.models.query import QuerySet, GeoQuerySet
 from django_pg.utils.repr import smart_repr
+import importlib
 
 
 # This is a monkey patch on `django.db.models.options.Options`.
@@ -12,27 +15,80 @@ if getattr(settings, 'DJANGOPG_IMPROVED_REPR', False):
                              ('repr_fields', 'repr_fields_exclude'))
 
 
-class Manager(models.Manager):
-    """Base model class, which extends Django's ORM with the
-    necessary extensions.
+def ManagerFactory(name, superclass, qs=QuerySet):
+    """Create a manager class, using the given superclass, and adding
+    django_pg's specific behavior.
     """
     # It's completely fine to use our custom manager for related fields,
     # and it's necessary, since we need to ensure that our custom queries
     # and query sets are what are created throughout.
-    use_for_related_fields = True
+    attrs = {
+        'use_for_related_fields': True,
+    }
 
-    def get_queryset(self):
-        return QuerySet(self.model, using=self._db)
+    # The `get_queryset` method changes in Django 1.6; introspect
+    # the superclass to see which one we should overwrite.
+    import django
+    if hasattr(superclass, 'get_queryset'):
+        attrs['get_queryset'] = lambda self: qs(self.model, using=self._db)
+    else:
+        attrs['get_query_set'] = lambda self: qs(self.model, using=self._db)
 
-    def get_query_set(self):
-        return self.get_queryset()
+    # Instantiate and return the Manager.
+    return type(superclass)(name, (superclass,), attrs)
+
+
+Manager = ManagerFactory('Manager', models.Manager)
+GeoManager = ManagerFactory('GeoManager', gis_models.GeoManager,
+                            qs=GeoQuerySet)
+
+
+def select_manager():
+    """If a manager is defined in the application's Django settings,
+    return an instance of it.
+
+    Otherwise, attempt to select the appropriate manager based on
+    introspecting the application's database settings, and instantiate
+    that one.
+    """
+    # First, is a manager specified in settings?
+    manager_class = getattr(settings, 'DJANGOPG_DEFAULT_MANAGER', None)
+    if manager_class:
+        # If we got a string, get the actual manager class.
+        if isinstance(manager_class, str):
+            # Sanity check: Did I get usable input?
+            if '.' not in manager_class:
+                raise ImportError(' '.join((
+                    'If DJANGOPG_DEFAULT_MANAGER is specified as a string,',
+                    'the full dotted module path is required.',
+                )))
+
+            # Break out the module and class name.
+            manager_module = '.'.join(manager_class.split('.')[:-1])
+            manager_class_name = manager_class.split('.')[-1]
+
+            # Import the module.
+            module = importlib.import_module(manager_module)
+
+            # Get the class out of the module and return an instance.
+            class_ = getattr(module, manager_class_name)
+            return class_()
+        else:
+            return manager_class()
+
+    # There was no manager class specified in settings; attempt
+    # to guess one based on database settings.
+    connection = connections[DEFAULT_DB_ALIAS]
+    if '.gis.' in connection.__module__:
+        return GeoManager()
+    return Manager()
 
 
 class Model(models.Model):
     """Base model class for `django_pg`, which extends Django's ORM
     with PostgreSQL-specific extensions.
     """
-    objects = Manager()
+    objects = select_manager()
 
     class Meta:
         abstract = True

@@ -120,6 +120,14 @@ class CompositeMeta(models.SubfieldBase):
         # get to it from there.
         new_class.instance_class = instance_class
 
+        # Ensure that the type exists in the database.
+        # This is the final hook for this; it will ensure the presence
+        #   of the type if the syncdb or connection creation hooks fail.
+        # This is, in particular, needed for testing, since the test
+        #   database types are copied from the main database, but the tests
+        #   don't have any guarantee that the main database ever ran.
+        new_class.create_type(connection)
+
         # Create a "caster class" for converting the value that
         #   comes out of the database into our new Python class.
         # For more info, see: http://initd.org/psycopg/docs/extras.html
@@ -128,11 +136,6 @@ class CompositeMeta(models.SubfieldBase):
                 **dict(zip(self.attnames, values))
             ),
         })
-
-        # Ensure that the type exists in the database. If it doesn't,
-        # create it.
-        if not new_class.type_exists(connection):
-            new_class.create_type(connection)
 
         # Register the caster class with psycopg2.
         new_class.register_composite(connection.cursor())

@@ -1,8 +1,9 @@
+from django.contrib.gis.db.models.sql import where as gis_where
 from django.db.models.sql import where
 
 
-class WhereNode(where.WhereNode):
-    """Subclass of the Django stock WhereNode class, which knows
+class WhereMixin:
+    """Mixin for where node classes, which teaches them
     how to perform PostgreSQL-specific operations added in django_pg.
     """
     def make_atom(self, child, qn, connection):
@@ -56,8 +57,16 @@ class WhereNode(where.WhereNode):
                     )
 
             # Use the superclass logic to handle this; it's a "normal" case.
-            return super(WhereNode, self).make_atom(
+            return super().make_atom(
                 child=child,
                 connection=connection,
                 qn=qn,
             )
+
+
+class WhereNode(WhereMixin, where.WhereNode):
+    pass
+
+
+class GeoWhereNode(WhereMixin, gis_where.GeoWhereNode):
+    pass

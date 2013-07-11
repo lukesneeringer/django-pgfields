@@ -1,13 +1,13 @@
 from django.db.models.sql import query
-from django.db.models.sql.constants import QUERY_TERMS
+from django.contrib.gis.db.models.sql import query as gis_query
+
+
+DJANGO_PG_QUERY_TERMS = { 'len' }
 
 
 class Query(query.Query):
-    """Query subclass which adds support for PostgreSQL specific
-    extensions provided by `django_pg`.
-    """
+    query_terms = query.Query.query_terms.union(DJANGO_PG_QUERY_TERMS)
 
-    # Add additional query terms which some fields understand.
-    query_terms = QUERY_TERMS.union(set([
-        'len',
-    ]))
+
+class GeoQuery(gis_query.GeoQuery):
+    query_terms = gis_query.GeoQuery.query_terms.union(DJANGO_PG_QUERY_TERMS)

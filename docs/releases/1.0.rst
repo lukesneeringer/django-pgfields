@@ -18,7 +18,32 @@ This release of django-pgfields contains the following major features:
 Features
 --------
 
+* Added `GeoDjango support <#geodjango-support>`_.
 * Added an `improved repr <#improved-repr>`_ implementation to Model.
+
+
+GeoDjango Support
+-----------------
+
+django-pgfields 1.0 resolves a previously-existing conflict between
+django-pgfields and GeoDjango (``django.contrib.gis``).
+
+Because both django-pgfields and GeoDjango implement their additional features
+by subclassing several classes within Django itself, it wasn't possible
+to use both of them.
+
+django-pgfields 1.0 removes this limitation by introspecting your database
+backend setting and assigning to models an appropriate Manager class. So,
+if you are using the ``django.contrib.gis.db.backends.postgis`` backend,
+you'll get our GeoManager subclass (without having to specify anything!), while
+if you're using the vanilla Django PostgreSQL backend, you'll get our
+Manager subclass.
+
+This functionality is provided across-the-board. However, if our introspection
+gets it wrong, you can define a ``DJANGOPG_DEFAULT_MANAGER`` setting,
+which will be applied to all models in lieu of django-pgfields' introspection.
+This is easier than manually assigning a manager to every model.
+
 
 Improved Repr
 -------------
@@ -31,6 +56,7 @@ provided on an opt-in basis, and will only be activated if you set a particular 
 
 For more information, see the
 `improved repr documentation <../misc.html#improved-repr>`_.
+
 
 Minor Improvements
 ------------------

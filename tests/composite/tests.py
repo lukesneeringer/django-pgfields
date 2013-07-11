@@ -229,6 +229,14 @@ class CreateTypeSuite(TestCase):
         self.assertContains(sql, '"name" varchar(50)')
         self.assertContains(sql, '"suffix" integer')
 
+    def test_composite_type_exists(self):
+        """Test that the `type_exists` method on CompositeField
+        works as expected.
+        """
+        from django.db import connection
+        field = Monarchy._meta.get_field('ruler')
+        self.assertEqual(field.type_exists(connection), True)
+
     def test_array_composite_sql(self):
         """Test that composite SQL returns correctly for composite
         fields within arrays.
@@ -244,7 +252,11 @@ class CreateTypeSuite(TestCase):
         CREATE TYPE SQL.
         """
         from django.db import connection
-
+        field = Character._meta.get_field('items')
+        sql = field.create_type_sql(connection)
+        self.assertContains(sql, 'CREATE TYPE "book"')
+        self.assertContains(sql, 'CREATE TYPE "item"')
+        self.assertContains(sql, '"acquired_in" book')
 
 
 class SupportSuite(TestCase):
