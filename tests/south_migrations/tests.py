@@ -95,8 +95,8 @@ class MigrationCreationSuite(TestCase):
         )
 
         # Establish that the `of` sub-field was generated as expected.
-        self.assertIsInstance(array_field._of, models.CharField)
-        self.assertEqual(array_field._of.max_length, 50)
+        self.assertIsInstance(array_field.of, models.CharField)
+        self.assertEqual(array_field.of.max_length, 50)
 
     def find_in_migration(self, anchor, needles, terminus='\n', distance=None):
         """Assert the presence of the given anchor in the output.

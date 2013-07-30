@@ -23,9 +23,9 @@ class ArrayField(models.Field, metaclass=models.SubfieldBase):
 
         # Arrays in PostgreSQL are arrays of a particular type.
         # Save the subtype in our field class.
-        self._of = of
-        if isinstance(self._of, type):
-            self._of = self._of()
+        self.of = of
+        if isinstance(self.of, type):
+            self.of = self.of()
 
         # Set "null" to True. Arrays don't have nulls, but null=True
         # in the ORM amounts to nothing in SQL (whereas null=False
@@ -36,14 +36,14 @@ class ArrayField(models.Field, metaclass=models.SubfieldBase):
         super().__init__(**kwargs)
 
     def create_type(self, connection):
-        if hasattr(self._of, 'create_type'):
-            return self._of.create_type(connection)
+        if hasattr(self.of, 'create_type'):
+            return self.of.create_type(connection)
         return
 
     def create_type_sql(self, connection, style=no_style(),
                                           only_if_not_exists=False ):
-        if hasattr(self._of, 'create_type_sql'):
-            return self._of.create_type_sql(connection, style,
+        if hasattr(self.of, 'create_type_sql'):
+            return self.of.create_type_sql(connection, style,
                                         only_if_not_exists=only_if_not_exists)
         return ''
 
@@ -51,7 +51,7 @@ class ArrayField(models.Field, metaclass=models.SubfieldBase):
         """Return the appropriate type to create a PostgreSQL array."""
 
         # Retrieve the SQL type of the sub-field.
-        db_subfield = self._of.db_type(connection)
+        db_subfield = self.of.db_type(connection)
 
         # Return the PostgreSQL array type syntax.
         return '%s[]' % db_subfield
@@ -103,7 +103,7 @@ class ArrayField(models.Field, metaclass=models.SubfieldBase):
         # If we're checking on a list, coerce each individual value into
         # its appropriate lookup type.
         if isinstance(value, (list, tuple)):
-            value = [self._of.get_prep_lookup('exact', i) for i in value]
+            value = [self.of.get_prep_lookup('exact', i) for i in value]
 
         # The superclass handling is good enough for everything else.
         return super().get_prep_lookup(lookup_type, value)
@@ -120,14 +120,14 @@ class ArrayField(models.Field, metaclass=models.SubfieldBase):
         # our array.
         answer = []
         for item in list(value):
-            answer.append(self._of.get_prep_value(item))
+            answer.append(self.of.get_prep_value(item))
 
         # Run the superclass' value coersion.
         return answer
 
     def register_composite(self, connection, globally=True):
-        if hasattr(self._of, 'register_composite'):
-            return self._of.register_composite(connection, globally=globally)
+        if hasattr(self.of, 'register_composite'):
+            return self.of.register_composite(connection, globally=globally)
         return
 
     def south_field_triple(self):
@@ -142,7 +142,7 @@ class ArrayField(models.Field, metaclass=models.SubfieldBase):
         #   the `introspector` function only returns the final two elements
         #   of a South triple. This is fine since those two pieces are all
         #   we actually need.
-        double = introspector(self._of)
+        double = introspector(self.of)
 
         # Return the appropriate South triple.
         return (
@@ -155,8 +155,8 @@ class ArrayField(models.Field, metaclass=models.SubfieldBase):
                 #   its internal field from this serialized state.
                 'of': (
                     '{module}.{class_name}'.format(
-                        module=self._of.__class__.__module__,
-                        class_name=self._of.__class__.__name__,
+                        module=self.of.__class__.__module__,
+                        class_name=self.of.__class__.__name__,
                     ),
                     double[0],
                     double[1],
@@ -172,4 +172,4 @@ class ArrayField(models.Field, metaclass=models.SubfieldBase):
         # However, the individual items within the list may need to run
         #   through the `_of` field's `to_python`.
         if isinstance(value, list):
-            return [self._of.to_python(i) for i in value]
+            return [self.of.to_python(i) for i in value]
