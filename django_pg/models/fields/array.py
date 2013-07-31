@@ -1,5 +1,6 @@
 from django.core.management.color import no_style
 from django.db import models
+from django_pg.utils.datatypes import CoerciveList
 from django_pg.utils.south import south_installed
 
 
@@ -166,10 +167,4 @@ class ArrayField(models.Field, metaclass=models.SubfieldBase):
 
     def to_python(self, value):
         """Convert the database value to a Python list."""
-
-        # We get lists back the vast majority of the time, because
-        #   psycopg2 is awesome.
-        # However, the individual items within the list may need to run
-        #   through the `_of` field's `to_python`.
-        if isinstance(value, list):
-            return [self.of.to_python(i) for i in value]
+        return CoerciveList(self.of.to_python, value)

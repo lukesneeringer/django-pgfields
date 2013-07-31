@@ -64,4 +64,6 @@ Minor Improvements
 * If ``auto_add=True`` is set on a UUID field, it now implies
   ``editable=False``. This makes it behave as much like AutoField as possible,
   since a primary key replacement is one of the most likely reasons to use
-  auto_add at all.
+  ``auto_add`` at all.
+* When using an ``ArrayField``, any item that is added to the list
+  is automatically coerced to the sub-field's format.
