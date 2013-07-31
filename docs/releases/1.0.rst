@@ -67,3 +67,7 @@ Minor Improvements
   ``auto_add`` at all.
 * When using an ``ArrayField``, any item that is added to the list
   is automatically coerced to the sub-field's format.
+* When a value for a ``CompositeField`` subclass is being coerced to the
+  appropriate Python type, all sub-items are coerced as well.
+* When using a ``CompositeField``, any item that is added to a key of the
+  field is automatically coerced to that key's format.

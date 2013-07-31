@@ -1,3 +1,4 @@
+from copy import copy
 from django.core.management.color import no_style
 from django.db import models
 from django.db.models.fields import NOT_PROVIDED
@@ -90,6 +91,14 @@ class CompositeField(models.Field, metaclass=CompositeMeta):
         return cls._meta.db_type
 
     @classmethod
+    def get_fields(cls):
+        return copy(cls._meta.fields)
+
+    @classmethod
+    def get_field_by_name(cls, field_name):
+        return { k: v for k, v in cls._meta.fields }[field_name]
+
+    @classmethod
     def register_composite(cls, cursor, globally=True):
         """Register this composite type with psycopg2."""
         return register_composite(cls.db_type(), cursor,
@@ -112,9 +121,11 @@ class CompositeField(models.Field, metaclass=CompositeMeta):
         """Convert the value to the appropriate Python type prior
         to assigning it.
         """
-        # If the value is already of the instance class,
-        # then simply pass it through unaltered.
+        # If the value is the instance class, then pass it through
+        # unaltered.
         if isinstance(value, self.instance_class):
+            for name, field in self.get_fields():
+                setattr(value, name, field.to_python(getattr(value, name)))
             return value
 
         # If the value is None or some other "falsy" value, simply
@@ -122,13 +133,18 @@ class CompositeField(models.Field, metaclass=CompositeMeta):
         if not value:
             return self.instance_class()
 
-        # FIXME: Support a list or namedtuple as an entry mechanism.
         # If the value is a list or a tuple, convert to the instance
         # class based on values.
         if isinstance(value, (list, tuple)):
-            return self.instance_class(*value)
+            return self.instance_class(
+                *[f[1].to_python(v) for f, v in zip(self.get_fields(), value)]
+            )
 
         # The other thing we can understand is a dictionary, or something
         # which can be sent to the dict constructor; pass it as keyword
         # arguments.
-        return self.instance_class(**dict(value))
+        kwargs = {}
+        for k, v in dict(value).items():
+            f = self.get_field_by_name(k)
+            kwargs[k] = f.to_python(v)
+        return self.instance_class(**kwargs)
