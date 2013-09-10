@@ -18,10 +18,13 @@ install:
     - cd ..
 before_script:
     # Install pip requirements.
-    - "pip install --use-mirrors -r requirements.txt"
-    - "pip install --use-mirrors -r tests/requirements.txt"
+    - pip install --use-mirrors -r requirements.txt
+    - pip install --use-mirrors -r tests/requirements.txt
+    - pip install coveralls --use-mirrors
 
     # Create our database.
     - "psql -U postgres -c 'create database django_pg;'"
     - "psql -U postgres -d django_pg -c 'create extension postgis;'"
 script: 'python setup.py test'
+after_success:
+    - coveralls
