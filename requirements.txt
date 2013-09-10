@@ -1,2 +1,2 @@
-django>=1.5.0
+django>=1.5.0,<1.7
 psycopg2>=2.5

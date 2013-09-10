@@ -1,6 +1,6 @@
 from django.db import connection
 from django.test import TestCase
-from tests.json_.models import Song
+from tests.jsont.models import Song
 import math
 
 
