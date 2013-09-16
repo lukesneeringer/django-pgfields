@@ -1,6 +1,9 @@
 from __future__ import absolute_import, unicode_literals
-from django.contrib.gis.db.models.sql import where as gis_where
 from django.db.models.sql import where
+from django_pg.utils.gis import gis_backend
+
+if gis_backend:
+    from django.contrib.gis.db.models.sql import where as gis_where
 
 
 class WhereMixin(object):
@@ -68,6 +71,6 @@ class WhereMixin(object):
 class WhereNode(WhereMixin, where.WhereNode):
     pass
 
-
-class GeoWhereNode(WhereMixin, gis_where.GeoWhereNode):
-    pass
+if gis_backend:
+    class GeoWhereNode(WhereMixin, gis_where.GeoWhereNode):
+        pass

@@ -1,13 +1,18 @@
 from __future__ import absolute_import, unicode_literals
 from django.conf import settings
-from django.contrib.gis.db import models as gis_models
 from django.db import connections, models
 from django.db.models import options
 from django.db.utils import DEFAULT_DB_ALIAS
-from django_pg.models.query import QuerySet, GeoQuerySet
+from django_pg.utils.gis import gis_backend
 from django_pg.utils.repr import smart_repr
 import importlib
 import six
+
+if gis_backend:
+    from django.contrib.gis.db import models as gis_models
+    from django_pg.models.query import QuerySet, GeoQuerySet
+else:
+    from django_pg.models.query import QuerySet
 
 
 # This is a monkey patch on `django.db.models.options.Options`.
@@ -46,8 +51,9 @@ def ManagerFactory(name, superclass, qs=QuerySet):
 
 
 Manager = ManagerFactory('Manager', models.Manager)
-GeoManager = ManagerFactory('GeoManager', gis_models.GeoManager,
-                            qs=GeoQuerySet)
+if gis_backend:
+    GeoManager = ManagerFactory('GeoManager', gis_models.GeoManager,
+                                qs=GeoQuerySet)
 
 
 def select_manager():

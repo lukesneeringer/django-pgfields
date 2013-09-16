@@ -1,8 +1,10 @@
 from __future__ import absolute_import, unicode_literals
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils.unittest import skipIf
 from django_pg import models
 from django_pg.models.base import select_manager
+from django_pg.utils.gis import gis_backend
 
 
 class CustomManagerSuite(TestCase):
@@ -28,18 +30,20 @@ class CustomManagerSuite(TestCase):
         self.assertIsInstance(Foo2.objects, models.Manager)
 
     @override_settings(DJANGOPG_DEFAULT_MANAGER='django_pg.models.GeoManager')
+    @skipIf(not gis_backend, 'GIS disabled.')
     def test_geo_manager_str(self):
         class Foo3(models.Model):
             objects = select_manager()
             bar = models.IntegerField()
         self.assertIsInstance(Foo3.objects, models.GeoManager)
 
-    @override_settings(DJANGOPG_DEFAULT_MANAGER=models.GeoManager)
+    @skipIf(not gis_backend, 'GIS disabled.')
     def test_geo_manager_obj(self):
-        class Foo4(models.Model):
-            objects = select_manager()
-            bar = models.IntegerField()
-        self.assertIsInstance(Foo4.objects, models.GeoManager)
+        with self.settings(DJANGOPG_DEFAULT_MANAGER=models.GeoManager):
+            class Foo4(models.Model):
+                objects = select_manager()
+                bar = models.IntegerField()
+            self.assertIsInstance(Foo4.objects, models.GeoManager)
         
 
 class ErrorSuite(TestCase):
