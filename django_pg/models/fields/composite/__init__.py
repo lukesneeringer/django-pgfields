@@ -102,9 +102,9 @@ class CompositeField(models.Field):
         return { k: v for k, v in cls._meta.fields }[field_name]
 
     @classmethod
-    def register_composite(cls, cursor, globally=True):
+    def register_composite(cls, connection, globally=True):
         """Register this composite type with psycopg2."""
-        return register_composite(str(cls.db_type()), cursor,
+        return register_composite(str(cls.db_type()), connection.cursor(),
             factory=cls.caster,
             globally=globally,
         )

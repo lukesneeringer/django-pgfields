@@ -4,7 +4,6 @@ from django.db.backends.signals import connection_created
 from django.db.models.loading import get_models
 from django.dispatch import receiver
 from django_pg.utils.utf8 import UnicodeAdapter
-from psycopg2.extras import register_composite
 from psycopg2.extensions import adapters, register_adapter
 import django
 
@@ -38,7 +37,7 @@ if django.VERSION >= (1, 6):
 
                     # If we were missing a field type, then the composite
                     # caster won't be registered with psycopg2 either.
-                    field.register_composite(connection.cursor())
+                    field.register_composite(connection)
 else:
     @receiver(connection_created)
     def on_connection_created(sender, connection, **kwargs):
@@ -54,4 +53,4 @@ else:
 
                     # If we were missing a field type, then the composite
                     # caster won't be registered with psycopg2 either.
-                    field.register_composite(connection.cursor())
+                    field.register_composite(connection)

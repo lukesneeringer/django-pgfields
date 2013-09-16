@@ -8,7 +8,7 @@ from django_pg.utils import Meta
 from django_pg.utils.types import type_exists
 from importlib import import_module
 from psycopg2.extensions import register_adapter
-from psycopg2.extras import CompositeCaster, register_composite
+from psycopg2.extras import CompositeCaster
 import re
 
 
@@ -143,7 +143,7 @@ class CompositeMeta(models.SubfieldBase):
         })
 
         # Register the caster class with psycopg2.
-        new_class.register_composite(connection.cursor())
+        new_class.register_composite(connection)
 
         # Register an adapter function with psycopg2. The adapter function
         # tells psycopg2 how to translate our instance class to SQL.
