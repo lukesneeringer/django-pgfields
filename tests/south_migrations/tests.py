@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils.unittest import skipIf
@@ -24,8 +25,9 @@ class MigrationCreationSuite(TestCase):
         """Test that array migrations are frozen as I expect."""
 
         self.find_in_migration("'books':", (
-            "'django_pg.models.fields.array.ArrayField', [], {'of': ",
-            "('tests.composite.fields.BookField', [], {})}),",
+            "%r, [], {%r: " % ('django_pg.models.fields.array.ArrayField',
+                               'of'),
+            "(%r, [], {})})," % 'tests.composite.fields.BookField',
         ))
 
     def test_array_forwards(self):
@@ -33,10 +35,10 @@ class MigrationCreationSuite(TestCase):
         migration appears to be valid code.
         """
         self.find_in_migration(
-            "db.add_column('south_migrations_author', 'books',",
+            "db.add_column(%r, 'books'," % 'south_migrations_author',
             (
-                "self.gf('django_pg.models.fields.array.ArrayField')(",
-                "of=('tests.composite.fields.BookField', [], {})",
+                "self.gf(%r)(" % 'django_pg.models.fields.array.ArrayField',
+                "of=(%r, [], {})" % 'tests.composite.fields.BookField',
                 "keep_default=False",
             ),
             distance=200,
@@ -55,7 +57,7 @@ class MigrationCreationSuite(TestCase):
         """
 
         self.find_in_migration(
-            "db.add_column('south_migrations_author', 'data',",
+            "db.add_column(%r, 'data'," % 'south_migrations_author',
             (
                 "self.gf('django_pg.models.fields.json.JSONField')(",
                 "keep_default=False",
@@ -77,7 +79,7 @@ class MigrationCreationSuite(TestCase):
         """
 
         self.find_in_migration(
-            "db.add_column('south_migrations_author', 'uuid',",
+            "db.add_column(%r, 'uuid'," % 'south_migrations_author',
             (
                 "self.gf('django_pg.models.fields.uuid.UUIDField')(",
                 "null=True",
@@ -108,9 +110,10 @@ class MigrationCreationSuite(TestCase):
         If `distance` is provided, each needle must appear within `distance`
         characters, and `terminus` is ignored.
         """
-
         # The anchor must exist. If it doesn't, we have another problem.
-        assert anchor in self.migration_code, 'Could not find: %s' % anchor
+        assert anchor in self.migration_code, 'Could not find: %s\nIn: %s' % (
+            anchor, self.migration_code,
+        )
         start = self.migration_code.index(anchor) + len(anchor)
 
         # If a distance is provided, get the substring based on it.

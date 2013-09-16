@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from copy import copy
 from django_pg.utils.datatypes import CoerciveList
 import unittest

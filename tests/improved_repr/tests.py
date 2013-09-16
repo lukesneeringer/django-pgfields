@@ -1,7 +1,9 @@
+from __future__ import absolute_import, unicode_literals
 from django.test import TestCase
 from django.test.utils import override_settings
 from tests.improved_repr.models import (Book, Movie, Publisher, Character,
                                         Interview, Studio)
+import re
 
 
 class BasicReprSuite(TestCase):
@@ -64,7 +66,7 @@ class ForeignKeyReprSuite(BasicReprSuite):
     a model with a foreign key is introduced.
     """
     def setUp(self):
-        super().setUp()
+        super(ForeignKeyReprSuite, self).setUp()
 
         # What model is being tested?
         self._testing_model = Movie
@@ -88,7 +90,7 @@ class M2MReprSuite(BasicReprSuite):
     as that is.
     """
     def setUp(self):
-        super().setUp()
+        super(M2MReprSuite, self).setUp()
 
         # What model is being tested?
         self._testing_model = Publisher
@@ -126,13 +128,13 @@ class RecursiveReprSuite(BasicReprSuite):
 
     @override_settings(DJANGOPG_REPR_TEMPLATE='single_line')
     def test_single_line_repr(self):
-        instance = super().test_single_line_repr()
+        instance = super(RecursiveReprSuite, self).test_single_line_repr()
         assert '**RECURSION**' in repr(instance)
         return instance
 
     @override_settings(DJANGOPG_REPR_TEMPLATE='multi_line')
     def test_multi_line_repr(self):
-        instance = super().test_multi_line_repr()
+        instance = super(RecursiveReprSuite, self).test_multi_line_repr()
         assert '**RECURSION**' in repr(instance)
         return instance
 
@@ -176,8 +178,8 @@ class ExcludeSuite(TestCase):
 
     def test_interview_repr(self):
         interview = Interview.objects.get()
-        assert "'subject': 'Peter Jackson'" in repr(interview)
-        assert "'role': 'Director'" in repr(interview)
+        assert re.search(r"u?'subject': u?'Peter Jackson'", repr(interview))
+        assert re.search(r"u?'role': u?'Director", repr(interview))
         assert 'on_dvd' not in repr(interview)
         assert 'on_blu_ray' not in repr(interview)
 
@@ -191,6 +193,6 @@ class IncludeSuite(TestCase):
 
     def test_studio_repr(self):
         studio = Studio.objects.get()
-        assert "'name': 'Wingnut Films'" in repr(studio)
+        assert re.search(r"u?'name': u?'Wingnut Films'", repr(studio))
         assert 'net_worth' not in repr(studio)
         assert '450000000' not in repr(studio)

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from collections import namedtuple
 from copy import copy
 from django.db import models, connection
@@ -11,7 +12,7 @@ from psycopg2.extras import CompositeCaster, register_composite
 import re
 
 
-class CompositeInstance:
+class CompositeInstance(object):
     def __init__(self, *args, **kwargs):
         # Assign the default values to the instance.
         for key, val in self._defaults.items():
@@ -73,10 +74,11 @@ class CompositeMeta(models.SubfieldBase):
                 fields.append((key, attrs.pop(key)))
 
         # Sort the fields, such that they are in the order they were
-        #   instantiated.
+        # instantiated.
+        # 
         # This is a trivial task because django.db.models.Field implements
-        #   __eq__, __lt__, and __gt__ methods that work against the field's
-        #   creation count.
+        # __eq__, __lt__, and __gt__ methods that work against the field's
+        # creation count.
         fields.sort(key=lambda item: item[1])
 
         # Create a "_meta" object (mimic how django.db.models.Model does it)
@@ -92,7 +94,7 @@ class CompositeMeta(models.SubfieldBase):
         meta_obj.fields += fields
 
         # Instantiate the class
-        new_class = super().__new__(cls, name, bases, attrs)
+        new_class = models.SubfieldBase.__new__(cls, name, bases, attrs)
 
         # Add the meta object to the class.
         new_class._meta = meta_obj
@@ -103,8 +105,10 @@ class CompositeMeta(models.SubfieldBase):
             return new_class
 
         # Additionally, create another class that will hold instance values.
-        class_name = re.sub(r'Field$', '', name)
-        field_names = [i[0] for i in meta_obj.fields]
+        # The `str` on the next two lines is intentional; I want a `str` object
+        # regardless of whether this is Python 2 or Python 3.
+        class_name = str(re.sub(r'Field$', '', name))
+        field_names = [str(i[0]) for i in meta_obj.fields]
         instance_class = type(class_name, (CompositeInstance,), {
             '_defaults': dict(
                 [(i[0], i[1].get_default()) for i in meta_obj.fields],
@@ -131,7 +135,8 @@ class CompositeMeta(models.SubfieldBase):
         # Create a "caster class" for converting the value that
         #   comes out of the database into our new Python class.
         # For more info, see: http://initd.org/psycopg/docs/extras.html
-        new_class.caster = type(class_name + 'Caster', (CompositeCaster,), {
+        caster_class_name = str(class_name + 'Caster')
+        new_class.caster = type(caster_class_name, (CompositeCaster,), {
             'make': lambda self, values: instance_class(
                 **dict(zip(self.attnames, values))
             ),
@@ -144,7 +149,7 @@ class CompositeMeta(models.SubfieldBase):
         # tells psycopg2 how to translate our instance class to SQL.
         register_adapter(instance_class, adapter_factory(
             db_type=meta_obj.db_type,
-            name=class_name + 'Adapter',
+            name=str(class_name + 'Adapter'),
         ))
 
         # If the instance class has a different name, try to be

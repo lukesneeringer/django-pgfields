@@ -1,6 +1,7 @@
+from __future__ import absolute_import, unicode_literals
+from django_pg.utils.south import south_installed
 import os
 import sys
-from django_pg.utils.south import south_installed
 
 
 DEBUG = True

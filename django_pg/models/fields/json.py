@@ -1,11 +1,14 @@
+from __future__ import absolute_import, unicode_literals
 from django.db import models
 from django.db.backends.postgresql_psycopg2.version import get_version
 from django_pg.utils.south import south_installed
 import json
 import re
+import six
 
 
-class JSONField(models.Field, metaclass=models.SubfieldBase):
+@six.add_metaclass(models.SubfieldBase)
+class JSONField(models.Field):
     """Specialized text field that holds JSON in the database, which is
     represented within Python as (usually) a dictionary."""
     
@@ -22,8 +25,8 @@ class JSONField(models.Field, metaclass=models.SubfieldBase):
         of any kind on JSON values.
         """
         # TODO: PostgreSQL 9.3 contains full support for lookups on JSON
-        #   fields. When PostgreSQL 9.3 is released, circle back and support
-        #   lookups appropriately.
+        # fields. When PostgreSQL 9.3 is released, circle back and support
+        # lookups appropriately.
         raise TypeError(' '.join((
             'Lookups of any kind on JSON fields are not permitted',
             'in PostgreSQL. This will change in PostgreSQL 9.3',
@@ -34,7 +37,7 @@ class JSONField(models.Field, metaclass=models.SubfieldBase):
         
     def to_python(self, value):
         # Lists, dicts, ints, and booleans are clearly fine as is.
-        if not isinstance(value, str):
+        if not isinstance(value, six.text_type):
             return value
             
         # Properly identify numbers and return them as ints or floats.

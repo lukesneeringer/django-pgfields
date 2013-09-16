@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from django.db import connection
 from django.test import TestCase
 from tests.jsont.models import Song
@@ -52,7 +53,7 @@ class JSONSuite(TestCase):
             sample_lines=[
                 'Chip the glasses and crack the plates!',
                 'Blunt the knives and bend the forks!',
-                "That's what Bilbo Baggins hates—",
+                "That's what Bilbo Baggins hates-",
                 'Smash the bottles and burn the corks!',
             ],
             stuff=6.8

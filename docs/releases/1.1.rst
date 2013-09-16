@@ -1,0 +1,20 @@
+===================
+django-pgfields 1.1
+===================
+
+Welcome to django-pgfields 1.1!
+
+Overview
+--------
+
+This release builds on django-pgfields 1.0 by adding support for Python 2.
+django-pgfields now adds six as a dependency, and is fully tested against
+Python 2.7.
+
+django-pgfields is not tested against Python 2.6 (but it's likely that
+it will work under Python 2.6).
+
+Features
+--------
+
+* Python 2.7 support.

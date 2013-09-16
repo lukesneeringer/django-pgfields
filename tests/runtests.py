@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from importlib import import_module
 import os
 import sys

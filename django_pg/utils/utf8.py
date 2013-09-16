@@ -1,4 +1,7 @@
-class UnicodeAdapter:
+from __future__ import absolute_import, unicode_literals
+
+
+class UnicodeAdapter(object):
     """Class for quoting a unicode string such that 4-bit unicode character
     support is retained.
     """

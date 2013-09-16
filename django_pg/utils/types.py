@@ -1,3 +1,6 @@
+from __future__ import absolute_import, unicode_literals
+
+
 # Taken from the following StackOverflow answer:
 #   http://stackoverflow.com/a/3703727/199176
 SELECT_TYPES_SQL = """

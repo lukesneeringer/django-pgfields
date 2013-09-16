@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.db import connections, models
@@ -6,6 +7,7 @@ from django.db.utils import DEFAULT_DB_ALIAS
 from django_pg.models.query import QuerySet, GeoQuerySet
 from django_pg.utils.repr import smart_repr
 import importlib
+import six
 
 
 # This is a monkey patch on `django.db.models.options.Options`.
@@ -35,7 +37,12 @@ def ManagerFactory(name, superclass, qs=QuerySet):
         attrs['get_query_set'] = lambda self: qs(self.model, using=self._db)
 
     # Instantiate and return the Manager.
-    return type(superclass)(name, (superclass,), attrs)
+    #
+    # Note: The `str` here is intentional; this should be an instance
+    # of the `str` class regardless of whether we are in Python 2 or Python 3.
+    # Under Python 2, this would otherwise be a `unicode` object, which
+    # won't work under the hood.
+    return type(superclass)(str(name), (superclass,), attrs)
 
 
 Manager = ManagerFactory('Manager', models.Manager)
@@ -55,7 +62,7 @@ def select_manager():
     manager_class = getattr(settings, 'DJANGOPG_DEFAULT_MANAGER', None)
     if manager_class:
         # If we got a string, get the actual manager class.
-        if isinstance(manager_class, str):
+        if isinstance(manager_class, six.text_type):
             # Sanity check: Did I get usable input?
             if '.' not in manager_class:
                 raise ImportError(' '.join((
@@ -100,7 +107,7 @@ class Model(models.Model):
         # Sanity check: Is our improved repr system turned on?
         # If it's not turned on, don't use it: this is an explicit opt-in.
         if not getattr(settings, 'DJANGOPG_IMPROVED_REPR', False):
-            return super().__repr__()
+            return super(Model, self).__repr__()
 
         # Sanity check: Have we rendered this object already?
         # Avoid a recursion scenario.
@@ -134,7 +141,7 @@ class Model(models.Model):
 
         # Determine the actual template in use.
         template = getattr(settings, 'DJANGOPG_REPR_TEMPLATE', 'single_line')
-        if isinstance(template, str):
+        if isinstance(template, six.text_type):
             template = repr_templates[template]
 
         # Return the improved repr.

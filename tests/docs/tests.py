@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from datetime import date
 from django.test import TestCase
 from tests.docs.models import Hobbit, Elf, Author, AuthorField, Book

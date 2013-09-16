@@ -1,8 +1,9 @@
+from __future__ import absolute_import, unicode_literals
 from django.contrib.gis.db.models.sql import where as gis_where
 from django.db.models.sql import where
 
 
-class WhereMixin:
+class WhereMixin(object):
     """Mixin for where node classes, which teaches them
     how to perform PostgreSQL-specific operations added in django_pg.
     """
@@ -57,7 +58,7 @@ class WhereMixin:
                     )
 
             # Use the superclass logic to handle this; it's a "normal" case.
-            return super().make_atom(
+            return super(WhereMixin, self).make_atom(
                 child=child,
                 connection=connection,
                 qn=qn,

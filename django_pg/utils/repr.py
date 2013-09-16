@@ -1,3 +1,6 @@
+from __future__ import absolute_import, unicode_literals
+
+
 def smart_repr(obj, object_list=None, depth=1):
     """Return a repr of the object, using the object's __repr__ method.
     Be smart and pass the depth value if and only if it's accepted.

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from django.contrib.gis.db.models import query as gis_query
 from django.db.models import query
 from django_pg.models.sql.query import Query, GeoQuery
@@ -12,7 +13,7 @@ class QuerySet(query.QuerySet):
         # Preserve all of the functionality of QuerySet, but
         # use our Query subclass instead of the Django stock one.
         query = query or Query(model, where=WhereNode)
-        super().__init__(model=model, query=query, using=using)
+        super(QuerySet, self).__init__(model=model, query=query, using=using)
 
 
 class GeoQuerySet(gis_query.GeoQuerySet):
@@ -23,4 +24,5 @@ class GeoQuerySet(gis_query.GeoQuerySet):
         # Preserve all of the functionality of QuerySet, but
         # use our Query subclass instead of the Django stock one.
         query = query or GeoQuery(model, where=GeoWhereNode)
-        super().__init__(model=model, query=query, using=using)
+        super(GeoQuerySet, self).__init__(model=model, query=query,
+                                          using=using)

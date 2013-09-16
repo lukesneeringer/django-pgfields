@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from collections import namedtuple
 from datetime import date
 from django.test import TestCase
@@ -16,12 +17,12 @@ class CompositeTestCase(TestCase):
             ruler=Monarch(title='King', name='Elessar', suffix=2),
         )
         Monarchy.objects.create(
-            name='Lothlórien',
+            name='Lothlorien',
             ruler=Monarch("H'Elf", 'Celeborn', 1),
         )
         Monarchy.objects.create(
             name='Rohan',
-            ruler=('King', 'Théoden', 2),
+            ruler=('King', 'Theoden', 2),
         )
         Monarchy.objects.create(
             name='Erebor',
@@ -44,7 +45,7 @@ class CompositeTestCase(TestCase):
         """Test that a lookup on a CompositeField value works as expected."""
         monarchy = Monarchy.objects.get(ruler=Monarch(
             title='King',
-            name='Théoden',
+            name='Theoden',
             suffix=2,
         ))
         self.assertEqual(monarchy.name, 'Rohan')
@@ -69,7 +70,7 @@ class CompositeTestCase(TestCase):
 
     def test_quoted_value(self):
         """Test that a quoted value is returned as expected."""
-        monarchy = Monarchy.objects.get(name='Lothlórien')
+        monarchy = Monarchy.objects.get(name='Lothlorien')
         self.assertEqual(monarchy.ruler.title, "H'Elf")
 
     def test_invalid_lookup(self):

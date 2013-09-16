@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from django.test import TestCase
 from tests.arrays.models import Place
 
@@ -14,7 +15,7 @@ class ArrayTests(TestCase):
             'Peregrin Took', 'Merridoc Brandybuck',
         ])
         Place.objects.create(name='Rohan', residents=[
-            'Théoden', 'Éomer', 'Éowyn',
+            'Theoden', 'Eomer', 'Eowyn',
         ])
         Place.objects.create(name='Mordor', residents=[])
 
@@ -52,7 +53,7 @@ class ArrayTests(TestCase):
         """Establish that this still works when interesting characters
         are involved.
         """
-        place = Place.objects.get(residents__contains='Éowyn')
+        place = Place.objects.get(residents__contains='Eowyn')
         self.assertEqual(place.name, 'Rohan')
 
     def test_array_lookup_len(self):

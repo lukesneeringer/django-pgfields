@@ -1,10 +1,13 @@
+from __future__ import absolute_import, unicode_literals
 from django.db.models import Field, SubfieldBase
 from django_pg.utils.south import south_installed
 from psycopg2.extensions import register_adapter
+import six
 import uuid
 
 
-class UUIDField(Field, metaclass=SubfieldBase):
+@six.add_metaclass(SubfieldBase)
+class UUIDField(Field):
     """Field for storing UUIDs."""
     description = 'Universally unique identifier.'
 
@@ -29,7 +32,7 @@ class UUIDField(Field, metaclass=SubfieldBase):
             )))
 
         # Now pass the rest of the work to CharField.
-        super().__init__(**kwargs)
+        super(UUIDField, self).__init__(**kwargs)
 
     def db_type(self, connection):
         return 'uuid'
@@ -61,7 +64,8 @@ class UUIDField(Field, metaclass=SubfieldBase):
         register_adapter(uuid.UUID, UUIDAdapter)
 
         # Run the normal functionality.
-        return super().get_db_prep_value(value, connection, prepared=prepared)
+        return super(UUIDField, self).get_db_prep_value(value, connection,
+                                                        prepared=prepared)
 
     def pre_save(self, instance, add):
         """If auto is set, generate a UUID at random."""
@@ -76,7 +80,7 @@ class UUIDField(Field, metaclass=SubfieldBase):
             return random_uuid
 
         # This is the standard case; just use the superclass logic.
-        return super().pre_save(instance, add)
+        return super(UUIDField, self).pre_save(instance, add)
 
     def to_python(self, value):
         """Return a UUID object."""
@@ -85,7 +89,7 @@ class UUIDField(Field, metaclass=SubfieldBase):
         return uuid.UUID(value)
 
 
-class UUIDAdapter:
+class UUIDAdapter(object):
     def __init__(self, value):
         if not isinstance(value, uuid.UUID):
             raise TypeError('UUIDAdapter only understands UUID objects.')

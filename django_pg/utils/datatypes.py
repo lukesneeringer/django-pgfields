@@ -1,3 +1,6 @@
+from __future__ import absolute_import, unicode_literals
+
+
 class CoerciveList(list):
     """List subclass that coerces every element in the list
     to an appropriate type.
@@ -6,7 +9,7 @@ class CoerciveList(list):
         """Initialize the coercive list, saving the field class that
         knows how to do the coercison, as well as any list sent.
         """
-        super().__init__()
+        super(CoerciveList, self).__init__()
         self.coerce = coerce
         if iterable:
             self.extend(iterable)
@@ -16,11 +19,11 @@ class CoerciveList(list):
         return self.__class__(self.coerce, self)
 
     def __repr__(self):
-        return super().__repr__()
+        return super(CoerciveList, self).__repr__()
 
     def append(self, item):
         item = self.coerce(item)
-        super().append(item)
+        super(CoerciveList, self).append(item)
 
     def extend(self, iterable):
         for item in iterable:
@@ -28,4 +31,4 @@ class CoerciveList(list):
 
     def insert(self, index, item):
         item = self.coerce(item)
-        super().insert(index, item)
+        super(CoerciveList, self).insert(index, item)

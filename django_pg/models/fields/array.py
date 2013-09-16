@@ -1,23 +1,27 @@
+from __future__ import absolute_import, unicode_literals
 from django.core.management.color import no_style
 from django.db import models
 from django_pg.utils.datatypes import CoerciveList
 from django_pg.utils.south import south_installed
+import six
 
 
-class ArrayField(models.Field, metaclass=models.SubfieldBase):
+@six.add_metaclass(models.SubfieldBase)
+class ArrayField(models.Field):
     """Field for storing PostgreSQL arrays."""
 
     description = 'PostgreSQL arrays.'
 
     def __init__(self, of=models.IntegerField, **kwargs):
         # The `of` argument is a bit tricky once we need compatibility
-        #   with South.
+        # with South.
+        # 
         # South can't store a field, and the eval it performs doesn't
-        #   put enough things in the context to use South's internal
-        #   "get field" function (`BaseMigration.gf`).
+        # put enough things in the context to use South's internal
+        # "get field" function (`BaseMigration.gf`).
+        # 
         # Therefore, we need to be able to accept a South triple of our
-        #   sub-field and hook into South to get the correct thing
-        #   back.
+        # sub-field and hook into South to get the correct thing back.
         if isinstance(of, tuple) and south_installed:
             from south.utils import ask_for_it_by_name as gf
             of = gf(of[0])(*of[1], **of[2])
@@ -34,7 +38,7 @@ class ArrayField(models.Field, metaclass=models.SubfieldBase):
         kwargs['null'] = True
 
         # Now pass the rest of the work to the Field superclass.
-        super().__init__(**kwargs)
+        super(ArrayField, self).__init__(**kwargs)
 
     def create_type(self, connection):
         if hasattr(self.of, 'create_type'):
@@ -85,8 +89,10 @@ class ArrayField(models.Field, metaclass=models.SubfieldBase):
             return [value]
 
         # Default behavior is fine in all other cases.
-        return super().get_db_prep_lookup(lookup_type, value, connection,
-                                            prepared=prepared, )
+        return super(ArrayField, self).get_db_prep_lookup(
+            lookup_type, value, connection,
+            prepared=prepared,
+        )
 
     def get_prep_lookup(self, lookup_type, value):
         # Handling for `__len`, which is a custom lookup type
@@ -107,7 +113,7 @@ class ArrayField(models.Field, metaclass=models.SubfieldBase):
             value = [self.of.get_prep_lookup('exact', i) for i in value]
 
         # The superclass handling is good enough for everything else.
-        return super().get_prep_lookup(lookup_type, value)
+        return super(ArrayField, self).get_prep_lookup(lookup_type, value)
 
     def get_prep_value(self, value):
         """Iterate over each item in the array, and run it

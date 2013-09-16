@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from django.db import connections
 from django.db.backends.signals import connection_created
 from django.db.models.loading import get_models

@@ -14,7 +14,7 @@ class Tox(TestCommand):
     Based on http://tox.readthedocs.org/en/latest/example/basic.html
     """
     def finalize_options(self):
-        super().finalize_options()
+        super(Tox, self).finalize_options()
         self.test_args = []
         self.test_suite = True
 
@@ -36,6 +36,7 @@ setup(
         'Provides custom Field subclasses intended for use with types',
         'available in PostgreSQL but not in the Django core ORM,',
         'including arrays and composite types.',
+        'For Python 2 or Python 3.',
     )),
     license='New BSD',
 
@@ -64,6 +65,7 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
         'Topic :: Database',
         'Topic :: Software Development',

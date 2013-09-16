@@ -1,7 +1,8 @@
+from __future__ import absolute_import, unicode_literals
 from psycopg2.extensions import adapt, SQL_IN
 
 
-class CompositeAdapter:
+class CompositeAdapter(object):
     db_type = ''
 
     def __init__(self, obj):

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from django.db.models.sql import query
 from django.contrib.gis.db.models.sql import query as gis_query
 

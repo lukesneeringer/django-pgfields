@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from copy import copy
 from django.core.management.color import no_style
 from django.db import models
@@ -6,16 +7,18 @@ from django.db.models.options import Options
 from django_pg.models.fields.composite.meta import CompositeMeta
 from django_pg.utils.types import type_exists
 from psycopg2.extras import register_composite
+import six
 
 
-class CompositeField(models.Field, metaclass=CompositeMeta):
+@six.add_metaclass(CompositeMeta)
+class CompositeField(models.Field):
     """Field class for storing PostgreSQL composite types."""
 
     def __init__(self, *args, **kwargs):
         # With composite fields, we need "null" and "blank"
         # to consistently be set to True.
         kwargs['null'] = True
-        super().__init__(*args, **kwargs)
+        super(CompositeField, self).__init__(*args, **kwargs)
 
     @property
     def field_names(self):
@@ -101,7 +104,7 @@ class CompositeField(models.Field, metaclass=CompositeMeta):
     @classmethod
     def register_composite(cls, cursor, globally=True):
         """Register this composite type with psycopg2."""
-        return register_composite(cls.db_type(), cursor,
+        return register_composite(str(cls.db_type()), cursor,
             factory=cls.caster,
             globally=globally,
         )

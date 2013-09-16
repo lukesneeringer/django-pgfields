@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from django.contrib.gis.geos import Point, Polygon
 from django.test import TestCase
 from django.utils.unittest import skipIf
