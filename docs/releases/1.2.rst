@@ -1,0 +1,18 @@
+===================
+django-pgfields 1.2
+===================
+
+Welcome to django-pgfields 1.2!
+
+Overview
+--------
+
+This release builds on django-pgfields 1.1 by adding support for coercing
+UUID fields to classes other than uuid.UUID.
+
+Features
+--------
+
+* UUIDField now supports a ``coerce_to`` argument, defaulting to
+  ``uuid.UUID``. The obvious use case for setting this is if you need
+  to get back str objects instead.

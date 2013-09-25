@@ -11,9 +11,10 @@ class UUIDField(Field):
     """Field for storing UUIDs."""
     description = 'Universally unique identifier.'
 
-    def __init__(self, auto_add=False, **kwargs):
-        # Save the `auto_add` field if necessary.
+    def __init__(self, auto_add=False, coerce_to=uuid.UUID, **kwargs):
+        # Save the `auto_add` and `coerce_to` rules.
         self._auto_add = auto_add
+        self._coerce_to = coerce_to
 
         # This should be a unique field by default.
         if 'unique' not in kwargs:
@@ -84,9 +85,9 @@ class UUIDField(Field):
 
     def to_python(self, value):
         """Return a UUID object."""
-        if isinstance(value, uuid.UUID) or not value:
+        if isinstance(value, self._coerce_to) or not value:
             return value
-        return uuid.UUID(value)
+        return self._coerce_to(value)
 
 
 class UUIDAdapter(object):
@@ -107,6 +108,7 @@ if south_installed:
         [],
         {
             'auto_add': ['_auto_add', { 'default': False }],
+            'coerce_to': ['_coerce_to', { 'default': uuid.UUID }],
             'unique': ['unique', { 'default': True }],
         },
     )], (r'^django_pg\.models\.fields\.uuid\.UUIDField',))

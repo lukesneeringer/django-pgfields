@@ -200,6 +200,22 @@ integers::
     >>> legolas.id
     UUID('b1f12115-3337-4ec0-acb9-1bcf63e44477')
 
+**coerce_to**
+
+.. versionadded:: 1.2
+
+By default, the ``to_python`` method on ``UUIDField`` will coerce values
+to UUID objects. Setting this option will use a different class constructor
+within ``to_python``.
+
+The general use-case for this is if you want to get strings instead of
+UUID objects. The following example would be the output in the case that
+you assigned ``coerce_to=str``::
+
+    >>> legolas = Elf(name='Legolas Greenleaf')
+    >>> legolas.save()
+    >>> legolas.id
+    'b1f12115-3337-4ec0-acb9-1bcf63e44477'
 
 Values
 ^^^^^^
