@@ -6,7 +6,7 @@ from sphinx.util.compat import Directive
 def setup(app):
     app.add_directive('versionadded', VersionDirective)
     app.add_directive('versionchanged', VersionDirective)
-    app.add_config_value('next_version', '1.2', True)
+    app.add_config_value('next_version', '1.3', True)
 
 
 class VersionDirective(Directive):
