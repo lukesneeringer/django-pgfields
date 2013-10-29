@@ -30,8 +30,19 @@ class CompositeField(models.Field):
         """Create the appropriate type in the database, if and only if
         it does not already exist.
         """
+        # Sanity check: Are we using a dummy database?
+        # An application using django-pgfields may disable their database
+        # **entirely** for testing purposes. If this happens, this should
+        # be a no-op, rather than an error.
+        if connection.vendor in ('dummy', 'unknown'):
+            return
+
+        # Retreive the SQL to create the type.
         sql = cls.create_type_sql(connection, only_if_not_exists=True)
         cursor = connection.cursor()
+
+        # Actually execute the SQL, thereby creating the composite
+        # type in the database.
         for sql_stmt in sql.split(';'):
             if not sql_stmt.strip():
                 continue
@@ -104,6 +115,15 @@ class CompositeField(models.Field):
     @classmethod
     def register_composite(cls, connection, globally=True):
         """Register this composite type with psycopg2."""
+
+        # Sanity check: Are we using a dummy database?
+        # An application using django-pgfields may disable their database
+        # **entirely** for testing purposes. If this happens, this should
+        # be a no-op, rather than an error.
+        if connection.vendor in ('dummy', 'unknown'):
+            return
+
+        # Register the composite type with psycopg2.
         return register_composite(str(cls.db_type()), connection.cursor(),
             factory=cls.caster,
             globally=globally,

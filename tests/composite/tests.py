@@ -1,7 +1,9 @@
 from __future__ import absolute_import, unicode_literals
 from collections import namedtuple
 from datetime import date
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import override_settings
 from django_pg import models
 from tests.composite.fields import Monarch, Book, Item
 from tests.composite.models import Monarchy, Author, Character

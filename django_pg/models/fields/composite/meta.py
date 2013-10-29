@@ -126,10 +126,11 @@ class CompositeMeta(models.SubfieldBase):
 
         # Ensure that the type exists in the database.
         # This is the final hook for this; it will ensure the presence
-        #   of the type if the syncdb or connection creation hooks fail.
+        # of the type if the syncdb or connection creation hooks fail.
+        #
         # This is, in particular, needed for testing, since the test
-        #   database types are copied from the main database, but the tests
-        #   don't have any guarantee that the main database ever ran.
+        # database types are copied from the main database, but the tests
+        # don't have any guarantee that the main database ever ran.
         new_class.create_type(connection)
 
         # Create a "caster class" for converting the value that
