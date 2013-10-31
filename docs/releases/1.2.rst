@@ -16,3 +16,9 @@ Features
 * UUIDField now supports a ``coerce_to`` argument, defaulting to
   ``uuid.UUID``. The obvious use case for setting this is if you need
   to get back str objects instead.
+
+Bugfixes
+--------
+
+* django-pgfields 1.2.1 fixes a bug regarding Unicode values within
+  ``CompositeField`` subclasses; sending unicode values will now work.
