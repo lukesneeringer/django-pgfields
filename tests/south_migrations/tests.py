@@ -21,6 +21,13 @@ class MigrationCreationSuite(TestCase):
             call_command('schemamigration', 'south_migrations', '-', auto=True)
             self.migration_code = std['out'].getvalue()
 
+    def test_pk_freeze(self):
+        """Test that the primary key is frozen as I expect."""
+
+        self.find_in_migration("'id':", (
+            "('django_pg.models.fields.uuid.UUIDField', [], {",
+        ), distance=100)
+
     def test_array_freeze(self):
         """Test that array migrations are frozen as I expect."""
 
