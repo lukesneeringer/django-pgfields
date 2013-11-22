@@ -3,8 +3,9 @@ from django.test import TestCase
 from django.utils.unittest import skipIf
 from django_pg import models
 from django_pg.models.fields.uuid import UUIDAdapter, UUIDField
+from django.test.utils import override_settings
 from django_pg.utils.south import south_installed
-from tests.uuidt.models import Movie, Game, Book
+from tests.uuidt.models import Movie, Game, Book, SomethingElse
 import uuid
 
 
@@ -54,6 +55,15 @@ class UUIDAutoSuite(TestCase):
         """Test that the auto-added UUID is, in fact, not editable."""
         id_field = Movie._meta.get_field_by_name('id')[0]
         self.assertEqual(id_field.editable, False)
+
+    def test_auto_uuid(self):
+        """Establish that the DJANGOPG_DEFAULT_UUID_PK setting correctly
+        adds a UUID instead of an auto-incrementing int field.
+        """
+        id_field = SomethingElse._meta.get_field_by_name('id')[0]
+        self.assertIsInstance(id_field, models.UUIDField)
+        self.assertTrue(id_field._auto_add)
+        self.assertTrue(id_field.primary_key)
 
 
 class UUIDManualSuite(TestCase):
@@ -125,3 +135,30 @@ class SupportSuite(TestCase):
         """
         with self.assertRaises(TypeError):
             adapter = UUIDAdapter('01234567-0123-0123-0123-0123456789ab')
+
+
+@override_settings(DJANGOPG_DEFAULT_UUID_PK=True)
+class ParentSuite(TestCase):
+    """Establish that parent-based models work with the feature that
+    automatically provides UUID primary keys.
+    """
+    def test_parent_with_explicit_id(self):
+        class Parent(models.Model):
+            id = models.CharField(max_length=20, primary_key=True)
+            foo = models.CharField(max_length=50)
+
+        class Child(Parent):
+            bar = models.CharField(max_length=100)
+
+        id_field = Child._meta.get_field_by_name('id')[0]
+        self.assertIsInstance(id_field, models.CharField)
+
+    def test_parent_without_explicit_id(self):
+        class ParentII(models.Model):
+            foo = models.CharField(max_length=50)
+
+        class ChildII(ParentII):
+            bar = models.CharField(max_length=50)
+
+        id_field = ChildII._meta.get_field_by_name('id')[0]
+        self.assertIsInstance(id_field, models.UUIDField)

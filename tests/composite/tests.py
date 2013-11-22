@@ -5,6 +5,7 @@ from django.db import connection
 from django.test import TestCase
 from django.test.utils import override_settings
 from django_pg import models
+from django_pg.models.fields.composite import CompositeField
 from tests.composite.fields import Monarch, Book, Item
 from tests.composite.models import Monarchy, Author, Character
 
@@ -281,3 +282,14 @@ class SupportSuite(TestCase):
         monarch = Monarch(title='King', name='Elessar', suffix=2)
         monarch_tuple = monarch_tuple_type('King', 'Elessar', 2)
         self.assertEqual(repr(monarch), repr(monarch_tuple))
+
+    def test_create_type_dummy(self):
+        class FakeConnection(object):
+            vendor = 'dummy'
+        self.assertEqual(CompositeField.create_type(FakeConnection()), None)
+
+    def test_register_composite_dummy(self):
+        class FakeConnection(object):
+            vendor = 'dummy'
+        self.assertEqual(CompositeField.register_composite(FakeConnection()),
+                         None)

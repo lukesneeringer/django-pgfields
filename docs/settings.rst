@@ -54,3 +54,18 @@ Sets the template that is used by the improved repr provided by
 django-pgfields. See the `improved repr`_ documentation for more details.
 
 .. _improved repr: misc.html
+
+
+DJANGOPG_DEFAULT_UUID_PK
+------------------------
+
+.. versionadded:: 1.3
+
+* default: ``False``
+
+If set to ``True``, this will cause models to get a UUID as their default
+primary key if none is specified, rather than an auto-incrementing integer.
+
+Note that this does not currently work on ``ManyToManyField`` instances
+that are automatically generated, as they inherit from
+``django.db.models.Model``.

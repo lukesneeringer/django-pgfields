@@ -97,7 +97,54 @@ def select_manager():
     return Manager()
 
 
-class Model(models.Model):
+class ModelBase(models.base.ModelBase):
+    """Subclass of the ModelBase metaclass which understands how to
+    add a UUID primary key instead of an integer primary key if asked.
+    """
+    def _prepare(cls):
+        opts = cls._meta
+
+        # If (and only if) we've been asked to through the
+        # `DJANGOPG_DEFAULT_UUID_PK` setting, create a primary key that is a
+        # UUID rather than an integer.
+        if getattr(settings, 'DJANGOPG_DEFAULT_UUID_PK', False):
+            if opts.pk is None:
+                # Django has a system where it checks for appropriate
+                # fields on parent models, if there are any.
+                #
+                # There's no good way to hook that in other than by copying
+                # that piece of the function, so I do so here.
+                #
+                # Code is taken from django/db/models/options.py, modified
+                # slightly since it's being run in ModelBase's prepare
+                # rather than Options's (and, obviously, modified to add
+                # a UUID rather than an ascending int).
+                if opts.parents:
+                    # Promote the first parent link in lieu of adding yet
+                    # another field.
+                    field = next(six.itervalues(opts.parents))
+
+                    # Look for a local field with the same name as the first
+                    # parent link. If a local field has already been created,
+                    # use it instead of promoting the parent.
+                    already_created = [fld for fld in opts.local_fields
+                                       if fld.name == field.name]
+                    if already_created:
+                        field = already_created[0]
+                    field.primary_key = True
+                    opts.setup_pk(field)
+                else:
+                    from django_pg.models.fields.uuid import UUIDField
+                    auto = UUIDField(auto_add=True, primary_key=True)
+                    cls.add_to_class('id', auto)
+
+        # Run the superclass method.
+        # Note: We can't use `super` effectively here, because of some
+        # subtleties of how six.with_metaclass works on Python 2.
+        return models.base.ModelBase._prepare(cls)
+
+
+class Model(six.with_metaclass(ModelBase, models.Model)):
     """Base model class for `django_pg`, which extends Django's ORM
     with PostgreSQL-specific extensions.
     """
@@ -113,7 +160,7 @@ class Model(models.Model):
         # Sanity check: Is our improved repr system turned on?
         # If it's not turned on, don't use it: this is an explicit opt-in.
         if not getattr(settings, 'DJANGOPG_IMPROVED_REPR', False):
-            return super(Model, self).__repr__()
+            return models.Model.__repr__(self)
 
         # Sanity check: Have we rendered this object already?
         # Avoid a recursion scenario.

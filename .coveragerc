@@ -2,11 +2,5 @@
 source = django_pg/
 branch = False
 
-[report]
-skip_lines =
-    # Don't complain about defensive lines for turning the
-    # database off.
-    if connection.vendor in ('dummy', 'unknown'):
-
 [html]
-directory = coverage/
+directory = .coverage-html/
