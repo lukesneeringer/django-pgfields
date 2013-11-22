@@ -1,0 +1,24 @@
+===================
+django-pgfields 1.3
+===================
+
+Welcome to django-pgfields 1.3!
+
+Overview
+--------
+
+This release builds on django-pgfields by adding support for automatically
+generated UUID primary keys on most models, as well as a more convenient
+way to specify ``select_related`` and ``prefetch_related``.
+
+
+Features
+--------
+
+* django-pgfields now defines a ``DJANGOPG_DEFAULT_UUID_PK`` setting. If set
+  to ``True`` (the default is ``False``), it will cause most models
+  created with no explicitly-specified primary key to get a UUID primary
+  key field, rather than an auto-incrementing primary key.
+* django-pgfields now builds on Django's default ``Model`` by adding support
+  for ``select_related`` and ``prefetch_related`` to be specified as options
+  on the ``Meta`` inner class.

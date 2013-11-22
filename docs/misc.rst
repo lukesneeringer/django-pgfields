@@ -89,3 +89,36 @@ dictionary with four elements:
   closing off a structure
 
 The glue is sent only the ``tab`` variable.
+
+
+Improved select_related and prefetch_related
+============================================
+
+.. versionadded:: 1.3
+
+django-pgfields adds ``select_related`` and ``prefetch_related`` as options
+that can be specified in the ``Meta`` inner class on a model.
+This allows a developer to gain the database efficiency of these methods
+if he knows that he will always want this or that related object.
+
+The syntax is thus::
+
+    from django_pg import models
+
+    class MyModel(models.Model):
+        my_other_model = models.ForeignKey(MyOtherModel)
+
+        class Meta:
+            select_related = 'my_other_model'
+
+If more than one field should be included, ``select_related`` can be specified
+as an iterable::
+
+    class Meta:
+        select_related = ('foo', 'bar')
+
+This will automatically cause querysets returned from ``Manager.get_queryset``
+to apply the appropriate ``select_related`` call.
+
+Note that while all of the above examples use ``select_related``, this
+same syntax also works for ``prefetch_related``.
