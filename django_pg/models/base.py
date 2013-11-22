@@ -21,6 +21,12 @@ if getattr(settings, 'DJANGOPG_IMPROVED_REPR', False):
     options.DEFAULT_NAMES = (options.DEFAULT_NAMES +
                              ('repr_fields', 'repr_fields_exclude'))
 
+# Add support for `select_related` and `prefetch_related` as a Meta option.
+# This adds a substantial level of convenience; otherwise, the developer
+# is often forced to make a Manager to get this database efficiency.
+options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('prefetch_related',
+                                                 'select_related')
+
 
 def ManagerFactory(name, superclass, qs=QuerySet):
     """Create a manager class, using the given superclass, and adding
@@ -35,11 +41,26 @@ def ManagerFactory(name, superclass, qs=QuerySet):
 
     # The `get_queryset` method changes in Django 1.6; introspect
     # the superclass to see which one we should overwrite.
-    import django
+    def _get_qs(self):
+        queryset = qs(self.model, using=self._db)
+
+        # If the model's `Meta` specifies a `select_related` or
+        # `prefetch_related` value, the queryset should automatically
+        # apply that.
+        for rel_type in ('select_related', 'prefetch_related'):
+            rel = getattr(self.model._meta, rel_type, ())
+            if isinstance(rel, (six.text_type, six.binary_type)):
+                rel = (rel,)
+            if rel:
+                queryset = getattr(queryset, rel_type)(*rel)
+
+        # Return the queryset.
+        return queryset
+
     if hasattr(superclass, 'get_queryset'):
-        attrs['get_queryset'] = lambda self: qs(self.model, using=self._db)
+        attrs['get_queryset'] = _get_qs
     else:
-        attrs['get_query_set'] = lambda self: qs(self.model, using=self._db)
+        attrs['get_query_set'] = _get_qs
 
     # Instantiate and return the Manager.
     #
