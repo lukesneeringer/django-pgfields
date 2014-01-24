@@ -181,6 +181,8 @@ the field options `available to all fields`_.
 
 **auto_add**
 
+.. versionmodified:: 1.4
+
 Normally, the UUIDField works like any other Field subclass; you are
 expected to provide a value, and the value is saved to the database directly.
 
@@ -199,6 +201,19 @@ integers::
     >>> legolas.save()
     >>> legolas.id
     UUID('b1f12115-3337-4ec0-acb9-1bcf63e44477')
+
+As of django-pgfields 1.4, it is *also* possible to use ``auto_add`` to
+generate a UUID using an algorithm other than ``uuid.uuid4``.  Instead of
+sending in ``True``, send in any callable which takes no arguments and
+reliably returns a UUID.
+
+For instance, the following field instantiation would cause a version 1 UUID
+to be used instead::
+
+    from django_pg import models
+    import uuid
+
+    id = models.UUID(auto_add=uuid.uuid1, primary_key=True)
 
 **coerce_to**
 
