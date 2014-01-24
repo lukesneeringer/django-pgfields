@@ -5,5 +5,5 @@ from django_pg import models
 class Song(models.Model):
     title = models.CharField(max_length=50)
     data = models.JSONField()
-    sample_lines = models.JSONField(default=[])
+    sample_lines = models.JSONField(type=list)
     stuff = models.JSONField(default=None)

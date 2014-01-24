@@ -1,6 +1,8 @@
 from __future__ import absolute_import, unicode_literals
+from django.core.exceptions import ValidationError
 from django.db import connection
 from django.test import TestCase
+from django_pg.models.fields.json import JSONField
 from tests.jsont.models import Song
 import math
 
@@ -172,9 +174,32 @@ class JSONSuite(TestCase):
         with self.assertRaises(TypeError):
             Song.objects.get(stuff__contains={ 'verses': 10 })
 
+    def test_invalid_assignment(self):
+        """Establish that assignment of an invalid value to a JSON
+        field raises ValidationError.
+        """
+        with self.assertRaises(TypeError):
+            song = Song(sample_lines={'foo': 'bar'})
+
+    def test_validation_falsy_coercion(self):
+        """Establish that if we begin with a falsy value on a typed JSONField,
+        that the value is converted to the correct type, and no error is
+        raised.
+        """
+        song = Song(title='Something', sample_lines='')
+        self.assertIsInstance(song.sample_lines, list)
+        self.assertEqual(song.sample_lines, [])
 
 class SupportSuite(TestCase):
     """Suite for testing more rarely-accessed aspects of JSON fields."""
+
+    def test_invalid_type_assignment(self):
+        """Establish that if we attempt to instantiate a JSONField
+        with a type that doesn't readily serialize to JSON, that we
+        raise TypeError.
+        """
+        with self.assertRaises(TypeError):
+            JSONField(type=object)
 
     def test_empty_string_assign(self):
         """Test that assignment of empty string works as expected."""
