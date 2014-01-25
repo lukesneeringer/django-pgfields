@@ -1,34 +1,31 @@
 language: python
 python:
   - 3.3
+  - 2.7
 env:
-  - POSTGIS_VERSION=2.0.3
+  - ADDITIONAL_REQUIREMENTS='django>=1.6,<1.7 south>=0.8'
+  - ADDITIONAL_REQUIREMENTS='django>=1.6,<1.7'  
+  - ADDITIONAL_REQUIREMENTS='django>=1.5,<1.6 south>=0.8'
+  - ADDITIONAL_REQUIREMENTS='django>=1.5,<1.6'
+addons:
+  postgresql: 9.2
 branches:
   except:
-    - /^[\w\d_-]+-unstable$/
+    - /-unstable$/
 cache: apt
 install:
-  # Install prerequisites for PostGIS.
-  - sudo apt-get update
-  - sudo apt-get install build-essential postgresql-9.1 postgresql-server-dev-9.1 libxml2-dev libproj-dev libjson0-dev libgeos-dev xsltproc docbook-xsl docbook-mathml libgdal1-dev
-
-  # Install PostGIS itself.
-  - wget http://download.osgeo.org/postgis/source/postgis-$POSTGIS_VERSION.tar.gz
-  - tar xfvz postgis-$POSTGIS_VERSION.tar.gz
-  - cd postgis-$POSTGIS_VERSION
-  - ./configure --without-topology --with-raster
-  - make
-  - sudo make install
-  - cd ..
-before_script:
   # Install pip requirements.
-  - pip install --use-mirrors -r requirements.txt
-  - pip install --use-mirrors -r tests/requirements.txt
-  - pip install coveralls --use-mirrors
+  - pip install --upgrade setuptools pip
+  - pip install -r requirements.txt
+  - pip install -r tests/requirements.txt
+  - pip install $ADDITIONAL_REQUIREMENTS
+  - pip install coverage coveralls
 
   # Create our database.
-  - "psql -U postgres -c 'create database django_pg;'"
-  - "psql -U postgres -d django_pg -c 'create extension postgis;'"
-script: 'python setup.py test'
+  - psql -U postgres -c 'create database django_pg;'
+  - psql -U postgres -d django_pg -c 'create extension postgis;'
+script:
+  - coverage run -p tests/runtests.py
+  - coverage run -p tests/runtests.py gis
 after_success:
   - coveralls
