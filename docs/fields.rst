@@ -123,6 +123,43 @@ fall back to the ``text`` data type.
     but it does *not* support *any* kind of lookup against JSON fields.
     Attempting *any* lookup will raise TypeError.
 
+Options
+^^^^^^^
+
+The JSON field implements the following field options in addition to
+the field options `available to all fields`_.
+
+**type**
+
+.. versionadded:: 1.4
+
+The ``type`` option adds an additional requirement that any value sent
+to this field must be of that type. The default is ``None``, which will
+allow any type that is JSON-serializable.
+
+Usage looks like::
+
+    data = models.JSONField(type=dict)
+
+Acceptable values for this option are: ``dict``, ``list``, ``str``/``unicode``
+(see below), ``int``, ``float``, and ``bool``.
+
+The common use case for this option is to allow code to expect a particular
+type of value from this field (``dict`` is the most common need).
+
+If you specify this option, an appropriate empty ``default`` value of that
+type will automatically be set. Therefore, the example above is exactly
+equivalent to::
+
+    data = models.JSONField(type=dict, default={})
+
+.. note::
+
+    If you want to require a string value (to be honest, I can't think of
+    any reason to do this rather than just use ``TextField``), you'll need
+    to specify the correct text type for the version of Python you're using.
+    If you're on Python 3, use ``str``; if you're on Python 2, use ``unicode``.
+
 Values
 ^^^^^^
 
