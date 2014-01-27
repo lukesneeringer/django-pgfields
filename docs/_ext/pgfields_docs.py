@@ -4,12 +4,12 @@ from sphinx.util.compat import Directive
 
 
 def setup(app):
-    app.add_directive('versionadded', VersionDirective)
-    app.add_directive('versionchanged', VersionDirective)
+    app.add_directive('versionadded', NewInVersionDirective)
+    app.add_directive('versionmodified', ChangedInVersionDirective)
     app.add_config_value('next_version', '1.4', True)
 
 
-class VersionDirective(Directive):
+class NewInVersionDirective(Directive):
     """Directive class for adding version notes."""
 
     has_content = True
@@ -17,6 +17,7 @@ class VersionDirective(Directive):
     optional_arguments = 1
     final_argument_whitespace = True
     option_spec = {}
+    _prefix = 'New in'
 
     def run(self):
         """Translate the directive to the appropriate markup."""
@@ -43,7 +44,7 @@ class VersionDirective(Directive):
         #   (and does so in a totally undocumented way). Sigh.
         kwargs = {}
         if not os.environ.get('READTHEDOCS', None):
-            kwargs['text'] = 'New in %s.' % version_string
+            kwargs['text'] = '%s %s.' % (self._prefix, version_string)
 
         # Create and append the node.
         node = addnodes.versionmodified(**kwargs)
@@ -56,3 +57,7 @@ class VersionDirective(Directive):
 
         # Done. Return the answer.
         return answer
+
+
+class ChangedInVersionDirective(NewInVersionDirective):
+    _prefix = 'Changed in'

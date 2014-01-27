@@ -12,6 +12,14 @@ class UUIDField(Field):
     description = 'Universally unique identifier.'
 
     def __init__(self, auto_add=False, coerce_to=uuid.UUID, **kwargs):
+        """Instantiate the field."""
+
+        # If the `auto_add` argument is specified as True, substitute an
+        # appropriate callable which requires no arguments and will return
+        # a UUID.
+        if auto_add is True:
+            auto_add = uuid.uuid4
+
         # Save the `auto_add` and `coerce_to` rules.
         self._auto_add = auto_add
         self._coerce_to = coerce_to
@@ -45,10 +53,8 @@ class UUIDField(Field):
         if not value:
             if self.null or self._auto_add:
                 return None
-            raise ValueError(' '.join((
-                'Explicit UUID required unless either `null`',
-                'or `auto_add` are True.',
-            )))
+            raise ValueError('Explicit UUID required unless either `null` is '
+                             'True or `auto_add` is given.')
 
         # If we already have a UUID, pass it through.
         if isinstance(value, uuid.UUID):
@@ -72,13 +78,14 @@ class UUIDField(Field):
         """If auto is set, generate a UUID at random."""
 
         # If the `auto_add` option was set, and there is no value
-        # on the model instance, then generate a random UUID.
+        # on the model instance, then generate a UUID using the given
+        # callable.
         if self._auto_add and add and not getattr(instance, self.attname):
-            random_uuid = uuid.uuid4()
+            uuid_value = self._auto_add()
 
             # Save the UUID to the model instance
-            setattr(instance, self.attname, random_uuid)
-            return random_uuid
+            setattr(instance, self.attname, uuid_value)
+            return uuid_value
 
         # This is the standard case; just use the superclass logic.
         return super(UUIDField, self).pre_save(instance, add)
