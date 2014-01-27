@@ -1,0 +1,25 @@
+===================
+django-pgfields 1.4
+===================
+
+Welcome to django-pgfields 1.4!
+
+Overview
+--------
+
+This release builds on django-pgfields by adding support for requiring
+a specific type on ``JSONField``, and for allowing arbitrary callables
+for generating UUIDs automatically on ``UUIDField``.
+
+
+Features
+--------
+
+* The ``JSONField`` class now allows you to send a ``type`` argument, along
+  with a class that is JSON serializable, such as ``dict`` or ``list``.
+  Use this to require that the root value of a JSONField always be a
+  particular type.
+* The ``UUIDField`` class now accepts a callable as the value of
+  ``auto_add`` (sending ``True`` still works). If specified, this callable
+  will be used to generate new UUIDs.  Any callable that takes no arguments
+  and reliably returns a UUID is acceptable.
