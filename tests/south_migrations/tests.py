@@ -5,6 +5,7 @@ from django.utils.unittest import skipIf
 from django_pg import models
 from django_pg.utils.context import redirect_std
 from django_pg.utils.south import south_installed
+import six
 
 
 @skipIf(not south_installed, 'South is not installed.')
@@ -26,7 +27,8 @@ class MigrationCreationSuite(TestCase):
 
         self.find_in_migration("'id':", (
             "('django_pg.models.fields.uuid.UUIDField', [], {",
-        ), distance=100)
+            'uuid:uuid4',
+        ), distance=200)
 
     def test_array_freeze(self):
         """Test that array migrations are frozen as I expect."""

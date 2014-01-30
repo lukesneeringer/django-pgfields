@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 from django.db.models import Field, SubfieldBase
 from django_pg.utils.south import south_installed
 from psycopg2.extensions import register_adapter
+import importlib
 import six
 import uuid
 
@@ -19,6 +20,13 @@ class UUIDField(Field):
         # a UUID.
         if auto_add is True:
             auto_add = uuid.uuid4
+
+        # If the `auto_add` arguments is specified as a string
+        # parse out and import the callable.
+        if isinstance(auto_add, six.text_type):
+            module_name, member = auto_add.split(':')
+            module = importlib.import_module(module_name)
+            auto_add = getattr(module, member)
 
         # Save the `auto_add` and `coerce_to` rules.
         self._auto_add = auto_add
@@ -96,6 +104,15 @@ class UUIDField(Field):
             return value
         return self._coerce_to(value)
 
+    @property
+    def _auto_add_str(self):
+        """Return a dot path, as a string, of the `_auto_add` callable.
+        If `_auto_add` is a boolean, return it unchanged.
+        """
+        if isinstance(self._auto_add, bool):
+            return self._auto_add
+        return '%s:%s' % (self._auto_add.__module__, self._auto_add.__name__)
+
 
 class UUIDAdapter(object):
     def __init__(self, value):
@@ -106,6 +123,7 @@ class UUIDAdapter(object):
     def getquoted(self):
         return ("'%s'" % self.value).encode('utf8')
 
+
 # If South is installed, then tell South how to properly
 # introspect a UUIDField.
 if south_installed:
@@ -114,7 +132,7 @@ if south_installed:
         (UUIDField,),
         [],
         {
-            'auto_add': ['_auto_add', { 'default': False }],
+            'auto_add': ['_auto_add_str', { 'default': False }],
             'coerce_to': ['_coerce_to', { 'default': uuid.UUID }],
             'unique': ['unique', { 'default': True }],
         },

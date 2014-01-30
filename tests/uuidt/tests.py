@@ -65,6 +65,13 @@ class UUIDAutoSuite(TestCase):
         self.assertTrue(id_field._auto_add)
         self.assertTrue(id_field.primary_key)
 
+    def test_uuid_field_auto_add_string(self):
+        """Establish that creating a UUID field with the `auto_add`
+        set to an appropriately-formatted string works as expected.
+        """
+        field = models.UUIDField(auto_add='uuid:uuid1')
+        self.assertEqual(field._auto_add, uuid.uuid1)
+
 
 class UUIDManualSuite(TestCase):
     """Test suite for manual UUID fields (those without `auto_add=True`)."""
