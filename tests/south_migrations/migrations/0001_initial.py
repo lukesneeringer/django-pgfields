@@ -8,6 +8,7 @@
 # --   makes sense if there is, in fact, something to migrate.      --
 # --------------------------------------------------------------------
 
+from __future__ import absolute_import, unicode_literals
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration

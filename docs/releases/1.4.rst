@@ -23,3 +23,6 @@ Features
   ``auto_add`` (sending ``True`` still works). If specified, this callable
   will be used to generate new UUIDs.  Any callable that takes no arguments
   and reliably returns a UUID is acceptable.
+* As of 1.4.2, django-pgfields ships with a ``DateTimeField`` subclass
+  that accepts UNIX timestamps as values (and otherwise behaves exactly
+  like its parent, the stock Django class).

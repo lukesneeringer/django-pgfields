@@ -122,3 +122,13 @@ to apply the appropriate ``select_related`` call.
 
 Note that while all of the above examples use ``select_related``, this
 same syntax also works for ``prefetch_related``.
+
+
+Improved DateTimeField
+======================
+
+.. versionadded:: 1.4.2
+
+django-pgfields provides a subclass of ``DateTimeField`` as of 1.4.2.
+This has identical functionality to the model provided in Django, with one
+addition: it will accept an integer (UNIX timestamp) if it is given one.

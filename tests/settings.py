@@ -24,6 +24,7 @@ DATABASES = {
 
 # Boilerplate settings.
 TIME_ZONE = 'America/Chicago'
+USE_TZ = True
 LANGUAGE_CODE = 'en-us'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATICFILES_DIRS = ()
