@@ -74,6 +74,13 @@ class ArrayTests(TestCase):
         with self.assertRaises(TypeError):
             place = Place.objects.get(residents__len='foo')
 
+    def test_array_lookup_len_zero(self):
+        """Establish that a lookup for an array length of 0 works
+        as expected.
+        """
+        place = Place.objects.get(residents__len=0)
+        self.assertEqual(place.name, 'Mordor')
+
     def test_empty_array(self):
         place = Place.objects.get(name='Mordor')
         self.assertEqual(place.residents, [])

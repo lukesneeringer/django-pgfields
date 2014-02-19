@@ -77,7 +77,9 @@ class ArrayField(models.Field):
         # If the lookup_type is "len", then we are asking for
         # an array of a given length.
         if lookup_type == 'len':
-            return '{value} = ARRAY_LENGTH({field}, 1)'
+            if value:
+                return '{value} = ARRAY_LENGTH({field}, 1)'
+            return 'ARRAY_LENGTH({field}, 1) IS NULL'
 
     def get_db_prep_lookup(self, lookup_type, value, connection,
                             prepared=False):

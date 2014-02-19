@@ -83,6 +83,8 @@ value is present, but ignore order of values in the array altogether::
 
 **len**
 
+.. versionmodified:: 1.4.3
+
 The ``len`` lookup type checks the *length of* the array, rather than its
 contents. It maps to the array_length_ function in PostgreSQL (with the second
 argument set to ``1``).
@@ -92,6 +94,11 @@ Such lookups are simple and straightforward::
     >>> hobbit = Hobbit.objects.get(favorite_foods__len=3)
     >>> hobbit.name
     'Peregrin Took'
+
+.. warning::
+
+    In versions of django-pgfields prior to 1.4.3, using ``0`` as a value
+    here was broken; it is fixed in 1.4.3.
 
 
 JSON Field
