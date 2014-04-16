@@ -19,8 +19,9 @@ class TestArrayDocs(TestCase):
         )
 
     def test_lookup_exact(self):
-        """Establish that the `exact` lookup works as documented."""
-
+        """Establish that the implicit `exact` lookup works
+        as documented.
+        """
         # Test the implicit method (which is the one everyone will
         # actually use).
         hobbit = Hobbit.objects.get(
@@ -28,19 +29,28 @@ class TestArrayDocs(TestCase):
         )
         self.assertEqual(hobbit.name, 'Peregrin Took')
 
+    def test_lookup_exact_explicit(self):
+        """Establish that the `exact` lookup works as documented if
+        explicitly provided, since this is explicitly documented in Django.
+        """
         # Test the explicit way, because it's explicitly documented.
         hobbit = Hobbit.objects.get(
             favorite_foods__exact=['apples', 'lembas bread', 'potatoes'],
         )
         self.assertEqual(hobbit.name, 'Peregrin Took')
 
-    def test_lookup_contains(self):
-        """Establish that the `contains` lookup works as documented."""
-
+    def test_lookup_contains_single(self):
+        """Establish that the `contains` lookup works as documented
+        when given a single scalar value.
+        """
         # Test a single-item containment lookup.
         hobbit = Hobbit.objects.get(favorite_foods__contains='apples')
         self.assertEqual(hobbit.name, 'Peregrin Took')
 
+    def test_lookup_contains_multiple(self):
+        """Establish that the `contains` lookup works as documented
+        with a list or tuple of values.
+        """
         # Test a multiple-item containment lookup.
         hobbit = Hobbit.objects.get(
             favorite_foods__contains=['lembas bread', 'apples'],

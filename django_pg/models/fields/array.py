@@ -1,6 +1,10 @@
 from __future__ import absolute_import, unicode_literals
 from django.core.management.color import no_style
 from django.db import models
+try:
+    from django_pg import lookups
+except ImportError:  # Django < 1.7
+    lookups = None
 from django_pg.utils.datatypes import CoerciveList
 from django_pg.utils.south import south_installed
 import six
@@ -10,6 +14,8 @@ import six
 class ArrayField(models.Field):
     """Field for storing PostgreSQL arrays."""
 
+    if lookups:  # Django 1.7
+        class_lookups = {'len': lookups.ArrayLength}
     description = 'PostgreSQL arrays.'
 
     def __init__(self, of=models.IntegerField, **kwargs):
@@ -95,6 +101,27 @@ class ArrayField(models.Field):
             lookup_type, value, connection,
             prepared=prepared,
         )
+
+    def get_lookup(self, lookup_name):
+        """Return the appropriate Django 1.7 lookup class for our
+        custom lookups.
+        """
+        # If this is a `__contains` lookup, return a custom ArrayContains
+        # subclass.
+        if lookup_name == 'contains':
+            class ArrayContains(lookups.ArrayContains):
+                field = self
+            return ArrayContains
+
+        # If this is an `__exact` lookup, return a custom ArrayExact
+        # subclass.
+        if lookup_name == 'exact':
+            class ArrayExact(lookups.ArrayExact):
+                field = self
+            return ArrayExact
+
+        # The standard superclass is acceptable in every other situation.
+        return super(ArrayField, self).get_lookup(lookup_name)
 
     def get_prep_lookup(self, lookup_type, value):
         # Handling for `__len`, which is a custom lookup type

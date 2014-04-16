@@ -17,6 +17,12 @@ if 'gis' in sys.argv:
 else:
     os.environ['DJANGO_SETTINGS_MODULE'] = 'tests.settings'
 
+# If we're in Django 1.7, we must explicitly set up the
+# application registry.
+import django
+if hasattr(django, 'setup'):
+    django.setup()
+
 # Run tests.
 from django.core.management import call_command
 
