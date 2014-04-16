@@ -46,5 +46,20 @@ class DateTimeFieldTests(unittest.TestCase):
         """
         dtf = DateTimeField()
         with mock.patch.object(DateTimeField, 'to_python') as tp:
+            tp.return_value = datetime(2012, 4, 21, 16, tzinfo=pytz.UTC)
             dtf.get_prep_value(1335024000)
-            tp.assert_called_once_with(1335024000)
+
+            # Starting in Django 1.7, there are actually two calls
+            # to `to_python`, because `DateTimeField` has become a subclass of
+            # `DateField`, and due to some internal esoteria each superclass
+            # calls `to_python`.
+            #
+            # Since `to_python` is idempotent, this is fine, but it broke
+            # the previous test that worked in 1.6 and below because that test
+            # expected only a single call.
+            #
+            # In this case, we can just ensure that the first call to
+            # `to_python` was, in fact, made with our timestamp argument,
+            # and we don't have to be opinionated on whether the second call
+            # happens or not.
+            self.assertEqual(tp.mock_calls[0], mock.call(1335024000))
