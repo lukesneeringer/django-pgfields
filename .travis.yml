@@ -3,6 +3,7 @@ python:
   - 3.3
   - 2.7
 env:
+  - ADDITIONAL_REQUIREMENTS='git+https://github.com/django/django.git@stable/1.7.x'
   - ADDITIONAL_REQUIREMENTS='django>=1.6,<1.7 south>=0.8'
   - ADDITIONAL_REQUIREMENTS='django>=1.6,<1.7'  
   - ADDITIONAL_REQUIREMENTS='django>=1.5,<1.6 south>=0.8'
