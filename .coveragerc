@@ -4,3 +4,8 @@ branch = False
 
 [html]
 directory = .coverage-html/
+
+[report]
+exclude_lines =
+    # Enable the standard pragma.
+    pragma: no cover
