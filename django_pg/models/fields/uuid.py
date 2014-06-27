@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 from django.db.models import Field, SubfieldBase
+from django.db.models.fields import NOT_PROVIDED
 from django_pg.utils.south import south_installed
 from psycopg2.extensions import register_adapter
 import importlib
@@ -59,7 +60,7 @@ class UUIDField(Field):
 
         # If the value is None, return None.
         if not value:
-            if self.null or self._auto_add:
+            if self.null or self._auto_add or (self.default != NOT_PROVIDED):
                 return None
             raise ValueError('Explicit UUID required unless either `null` is '
                              'True or `auto_add` is given.')

@@ -227,6 +227,15 @@ the field options `available to all fields`_.
 
 .. versionmodified:: 1.4
 
+.. note::
+
+    If you're using Django 1.7 or higher *and* the new Django migration
+    system (not South), you probably don't need ``auto_add``. Simply use
+    ``default=uuid.uuid4`` to get the same effect.
+
+    If you're using South, however, you probably do want ``auto_add``,
+    so this feature will remain in place for the forseeable future.
+
 Normally, the UUIDField works like any other Field subclass; you are
 expected to provide a value, and the value is saved to the database directly.
 
