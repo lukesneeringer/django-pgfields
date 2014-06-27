@@ -44,6 +44,14 @@ for module in os.listdir(os.path.dirname(__file__)):
 if south_installed:
     INSTALLED_APPS.append('south')
 
+# We don't really care what middleware is installed for our purposes,
+# but we really want Django 1.7's check/warning system to be quiet about
+# this not being explicitly set.
+MIDDLEWARE_CLASSES = (
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+)
+
 # Easiest default test settings for django-pgfields itself.
 DJANGOPG_IMPROVED_REPR = True
 DJANGOPG_REPR_TEMPLATE = 'single_line'
